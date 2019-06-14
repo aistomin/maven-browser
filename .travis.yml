@@ -1,0 +1,10 @@
+language: java
+jdk:
+  - oraclejdk8
+branches:
+  only:
+    - master
+env:
+  global:
+    - MAVEN_OPTS="-XX:MaxPermSize=512m -Xmx2g"
+script: mvn clean install -Pqulice

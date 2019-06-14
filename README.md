@@ -1,4 +1,6 @@
 # maven-browser
+[![Build Status](https://travis-ci.org/aistomin/maven-browser.svg?branch=master)](https://travis-ci.org/aistomin/maven-browser)
+
 Java library which allows to search and browse the Maven artifacts.
 
 ## idea

@@ -1,0 +1,10 @@
+env:
+  MAVEN_OPTS: "-XX:MaxPermSize=256m -Xmx1g"
+
+merge:
+  commanders:
+    - aistomin
+  script: |-
+    java -version
+    mvn -version
+    mvn clean install -Pqulice

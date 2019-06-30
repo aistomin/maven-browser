@@ -15,29 +15,23 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.UUID;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
- * Simple implementation of the Maven group entity.
+ * The tests for {@link MavenGroup}.
  *
  * @since 0.1
  */
-public final class MavenGroup implements MvnGroup {
+public final class MavenGroupTest {
 
     /**
-     * The Maven group's name.
+     * Check that we correctly assign and return the name of the group.
      */
-    private final String group;
-
-    /**
-     * Ctor.
-     *
-     * @param name The Maven group's name.
-     */
-    public MavenGroup(final String name) {
-        this.group = name;
-    }
-
-    @Override
-    public String name() {
-        return this.group;
+    @Test
+    void testName() {
+        final String name = UUID.randomUUID().toString();
+        Assertions.assertEquals(name, new MavenGroup(name).name());
     }
 }

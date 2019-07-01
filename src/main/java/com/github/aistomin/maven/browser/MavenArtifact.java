@@ -15,33 +15,55 @@
  */
 package com.github.aistomin.maven.browser;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 /**
  * Simple implementation of the Maven artifact entity.
  *
  * @since 0.1
- * @todo: Issue #13. Let's implement it and remove this todo.
  */
 public final class MavenArtifact implements MvnArtifact {
+
+    /**
+     * The artifact's name.
+     */
+    private final String artifact;
+
+    /**
+     * The artifact's group.
+     */
+    private final MvnGroup grp;
+
+    /**
+     * The latest artifact version.
+     */
+    private final MvnArtifactVersion latest;
+
+    /**
+     * Ctor.
+     * @param name The artifact's name.
+     * @param group The artifact's group.
+     * @param version The latest artifact version.
+     */
+    public MavenArtifact(
+        final String name, final MvnGroup group,
+        final MvnArtifactVersion version
+    ) {
+        this.artifact = name;
+        this.grp = group;
+        this.latest = version;
+    }
+
     @Override
     public MvnGroup group() {
-        throw new NotImplementedException(
-            "The method MavenArtifact.group() is not implemented."
-        );
+        return this.grp;
     }
 
     @Override
     public String name() {
-        throw new NotImplementedException(
-            "The method MavenArtifact.name() is not implemented."
-        );
+        return this.artifact;
     }
 
     @Override
     public MvnArtifactVersion latestVersion() {
-        throw new NotImplementedException(
-            "The method MavenArtifact.latestVersion() is not implemented."
-        );
+        return this.latest;
     }
 }

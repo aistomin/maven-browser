@@ -20,21 +20,26 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * The tests for {@link MavenArtifact}.
+ * The tests for {@link MavenArtifactVersion}.
  *
  * @since 0.1
  */
-public final class MavenArtifactTest {
+public final class MavenArtifactVersionTest {
 
     /**
      * Check that we assign and return the encapsulated fields properly.
      */
     @Test
     void testConstruct() {
+        final MvnArtifact artifact = new MavenArtifact(
+            UUID.randomUUID().toString(),
+            new MavenGroup(UUID.randomUUID().toString())
+        );
         final String name = UUID.randomUUID().toString();
-        final MvnGroup group = new MavenGroup(UUID.randomUUID().toString());
-        final MvnArtifact artifact = new MavenArtifact(name, group);
-        Assertions.assertEquals(name, artifact.name());
-        Assertions.assertEquals(group, artifact.group());
+        final MvnArtifactVersion version = new MavenArtifactVersion(
+            artifact, name
+        );
+        Assertions.assertEquals(name, version.name());
+        Assertions.assertEquals(artifact, version.artifact());
     }
 }

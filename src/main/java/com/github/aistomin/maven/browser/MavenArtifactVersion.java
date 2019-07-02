@@ -15,27 +15,43 @@
  */
 package com.github.aistomin.maven.browser;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 /**
  * Simple implementation of the Maven artifact's version entity.
  *
  * @since 0.1
- * @todo: Issue #14. Let's implement it and remove this todo.
  */
 public final class MavenArtifactVersion implements MvnArtifactVersion {
 
+    /**
+     * Maven artifact.
+     */
+    private final MvnArtifact art;
+
+    /**
+     * Maven artifact version.
+     */
+    private final String ver;
+
+    /**
+     * Ctor.
+     *
+     * @param artifact Maven artifact.
+     * @param version Maven artifact version.
+     */
+    public MavenArtifactVersion(
+        final MvnArtifact artifact, final String version
+    ) {
+        this.art = artifact;
+        this.ver = version;
+    }
+
     @Override
     public MvnArtifact artifact() {
-        throw new NotImplementedException(
-            "The method MavenArtifactVersion.artifact() is not implemented."
-        );
+        return this.art;
     }
 
     @Override
     public String name() {
-        throw new NotImplementedException(
-            "The method MavenArtifactVersion.name() is not implemented."
-        );
+        return this.ver;
     }
 }

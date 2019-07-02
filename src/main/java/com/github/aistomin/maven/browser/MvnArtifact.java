@@ -35,11 +35,4 @@ public interface MvnArtifact {
      * @return The name of the artifact.
      */
     String name();
-
-    /**
-     * The latest realeased version of the artifact.
-     *
-     * @return The latest version.
-     */
-    MvnArtifactVersion latestVersion();
 }

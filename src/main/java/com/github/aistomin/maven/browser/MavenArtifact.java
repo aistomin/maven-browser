@@ -33,23 +33,13 @@ public final class MavenArtifact implements MvnArtifact {
     private final MvnGroup grp;
 
     /**
-     * The latest artifact version.
-     */
-    private final MvnArtifactVersion latest;
-
-    /**
      * Ctor.
      * @param name The artifact's name.
      * @param group The artifact's group.
-     * @param version The latest artifact version.
      */
-    public MavenArtifact(
-        final String name, final MvnGroup group,
-        final MvnArtifactVersion version
-    ) {
+    public MavenArtifact(final String name, final MvnGroup group) {
         this.artifact = name;
         this.grp = group;
-        this.latest = version;
     }
 
     @Override
@@ -60,10 +50,5 @@ public final class MavenArtifact implements MvnArtifact {
     @Override
     public String name() {
         return this.artifact;
-    }
-
-    @Override
-    public MvnArtifactVersion latestVersion() {
-        return this.latest;
     }
 }

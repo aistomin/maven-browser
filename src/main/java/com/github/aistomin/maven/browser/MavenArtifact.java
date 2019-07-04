@@ -23,6 +23,11 @@ package com.github.aistomin.maven.browser;
 public final class MavenArtifact implements MvnArtifact {
 
     /**
+     * Magic number that we use for generating hash code.
+     */
+    private static final int MAGIC_NUMBER = 31;
+
+    /**
      * The artifact's name.
      */
     private final String artifact;
@@ -34,6 +39,7 @@ public final class MavenArtifact implements MvnArtifact {
 
     /**
      * Ctor.
+     *
      * @param name The artifact's name.
      * @param group The artifact's group.
      */
@@ -50,5 +56,20 @@ public final class MavenArtifact implements MvnArtifact {
     @Override
     public String name() {
         return this.artifact;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return this == obj
+            || obj != null
+            && getClass() == obj.getClass()
+            && this.artifact.equals(((MavenArtifact) obj).artifact)
+            && this.grp.equals(((MavenArtifact) obj).grp);
+    }
+
+    @Override
+    public int hashCode() {
+        return MavenArtifact.MAGIC_NUMBER * this.artifact.hashCode()
+            + this.grp.hashCode();
     }
 }

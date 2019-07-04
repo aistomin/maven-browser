@@ -27,12 +27,15 @@ public interface MvnRepo {
     /**
      * Search for the artifacts.
      *
-     * @param str The search string.
-     * @param indent Indent of the search.
+     * @param str The search string. It may be a part of group or artifact name.
+     * @param start The start index of the search.
      * @param rows The max amount of results.
      * @return The list of the found artifacts.
+     * @throws Exception If the problem occurred while reading from the repo.
      */
-    List<MvnArtifact> findArtifacts(String str, Integer indent, Integer rows);
+    List<MvnArtifact> findArtifacts(
+        String str, Integer start, Integer rows
+    ) throws Exception;
 
     /**
      * Search for the versions of the artifact.

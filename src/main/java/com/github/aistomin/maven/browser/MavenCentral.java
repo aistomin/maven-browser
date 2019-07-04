@@ -15,28 +15,73 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 /**
  * The class which works with Maven Central repository.
  * URL: https://search.maven.org/
  *
- * @since 0.1
- * @todo: Issue #9. Let's implement it and remove this todo.
  * @todo: Issue #10. Let's implement it and remove this todo.
  * @todo: Issue #11. Let's implement it and remove this todo.
  * @todo: Issue #12. Let's implement it and remove this todo.
+ * @since 0.1
  */
 public final class MavenCentral implements MvnRepo {
 
+    /**
+     * The Maven repo base URL.
+     */
+    private final String repo;
+
+    /**
+     * Ctor.
+     *
+     * @param repository The Maven repo base URL.
+     */
+    public MavenCentral(final String repository) {
+        this.repo = repository;
+    }
+
+    /**
+     * Ctor.
+     */
+    public MavenCentral() {
+        this("https://search.maven.org");
+    }
+
     @Override
     public List<MvnArtifact> findArtifacts(
-        final String str, final Integer indent, final Integer rows
-    ) {
-        throw new NotImplementedException(
-            "The method MavenCentral.findArtifacts() is not implemented."
+        final String str, final Integer start, final Integer rows
+    ) throws Exception {
+        final String result = IOUtils.toString(
+            URI.create(
+                String.format(
+                    "%s/solrsearch/select?q=%s&start=%d&rows=%d&wt=json",
+                    this.repo, str, start, rows
+                )
+            ),
+            "UTF-8"
         );
+        final JSONArray docs = (JSONArray) (
+            (JSONObject) ((JSONObject) new JSONParser().parse(result))
+                .get("response")
+        ).get("docs");
+        return new ArrayList<JSONObject>(docs)
+            .stream()
+            .map(
+                json -> new MavenArtifact(
+                    (String) json.get("a"),
+                    new MavenGroup((String) json.get("g"))
+                )
+            ).collect(Collectors.toList());
     }
 
     @Override

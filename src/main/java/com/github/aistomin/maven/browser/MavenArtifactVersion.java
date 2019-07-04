@@ -23,6 +23,11 @@ package com.github.aistomin.maven.browser;
 public final class MavenArtifactVersion implements MvnArtifactVersion {
 
     /**
+     * Magic number that we use for generating hash code.
+     */
+    private static final int MAGIC_NUMBER = 31;
+
+    /**
      * Maven artifact.
      */
     private final MvnArtifact art;
@@ -53,5 +58,20 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     @Override
     public String name() {
         return this.ver;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return this == obj
+            || obj != null
+            && getClass() == obj.getClass()
+            && this.art.equals(((MavenArtifactVersion) obj).art)
+            && this.ver.equals(((MavenArtifactVersion) obj).ver);
+    }
+
+    @Override
+    public int hashCode() {
+        return MavenArtifactVersion.MAGIC_NUMBER * this.art.hashCode()
+            + this.ver.hashCode();
     }
 }

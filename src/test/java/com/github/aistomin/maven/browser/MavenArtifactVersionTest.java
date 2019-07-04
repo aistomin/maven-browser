@@ -15,6 +15,8 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,5 +43,29 @@ public final class MavenArtifactVersionTest {
         );
         Assertions.assertEquals(name, version.name());
         Assertions.assertEquals(artifact, version.artifact());
+    }
+
+    /**
+     * Check that we correctly override equals and hashCode methods.
+     */
+    @Test
+    void testEqualsAndHashCode() {
+        final String group = UUID.randomUUID().toString();
+        final String artifact = UUID.randomUUID().toString();
+        final String version = UUID.randomUUID().toString();
+        final MavenArtifactVersion first = new MavenArtifactVersion(
+            new MavenArtifact(
+                artifact, new MavenGroup(group)
+            ), version
+        );
+        final MavenArtifactVersion second = new MavenArtifactVersion(
+            new MavenArtifact(
+                artifact, new MavenGroup(group)
+            ), version
+        );
+        Assertions.assertEquals(first, second);
+        Assertions.assertEquals(
+            1, new HashSet<>(Arrays.asList(first, second)).size()
+        );
     }
 }

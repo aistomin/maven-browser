@@ -15,6 +15,8 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,5 +35,19 @@ public final class MavenGroupTest {
     void testName() {
         final String name = UUID.randomUUID().toString();
         Assertions.assertEquals(name, new MavenGroup(name).name());
+    }
+
+    /**
+     * Check that we correctly override equals and hashCode methods.
+     */
+    @Test
+    void testEqualsAndHashCode() {
+        final String group = UUID.randomUUID().toString();
+        final MavenGroup first = new MavenGroup(group);
+        final MavenGroup second = new MavenGroup(group);
+        Assertions.assertEquals(first, second);
+        Assertions.assertEquals(
+            1, new HashSet<>(Arrays.asList(first, second)).size()
+        );
     }
 }

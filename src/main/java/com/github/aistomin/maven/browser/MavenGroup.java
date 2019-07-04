@@ -40,4 +40,17 @@ public final class MavenGroup implements MvnGroup {
     public String name() {
         return this.group;
     }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return this == obj
+            || obj != null
+            && getClass() == obj.getClass()
+            && this.group.equals(((MavenGroup) obj).group);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.group.hashCode();
+    }
 }

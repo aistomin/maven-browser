@@ -27,11 +27,6 @@ import org.junit.jupiter.api.Test;
 public final class MavenCentralTest {
 
     /**
-     * Total amount of the artifacts which we load in test.
-     */
-    public static final int TOTAL = 20;
-
-    /**
      * The size of the part which we load later to compare with total.
      */
     public static final int PART = 5;
@@ -47,9 +42,21 @@ public final class MavenCentralTest {
         final MavenCentral mvn = new MavenCentral();
         final String search = "guice";
         final List<MvnArtifact> artifacts = mvn.findArtifacts(
-            search, 0, MavenCentralTest.TOTAL
+            search, 0, MavenCentral.MAX_ROWS
         );
-        Assertions.assertEquals(MavenCentralTest.TOTAL, artifacts.size());
+        Assertions.assertEquals(
+            MavenCentral.MAX_ROWS, artifacts.size()
+        );
+        final List<MvnArtifact> def = mvn.findArtifacts(search);
+        Assertions.assertEquals(
+            artifacts.size(), def.size()
+        );
+        def.forEach(
+            artifact ->
+                Assertions.assertEquals(
+                    def.indexOf(artifact), artifacts.indexOf(artifact)
+                )
+        );
         final int start = 2;
         final List<MvnArtifact> part = mvn.findArtifacts(
             search, start, MavenCentralTest.PART
@@ -60,6 +67,12 @@ public final class MavenCentralTest {
                 Assertions.assertEquals(
                     part.indexOf(artifact), artifacts.indexOf(artifact) - start
                 )
+        );
+        final List<MvnArtifact> mine = mvn.findArtifacts("aistomin");
+        Assertions.assertEquals(1, mine.size());
+        Assertions.assertEquals("jenkins-sdk", mine.get(0).name());
+        Assertions.assertEquals(
+            "com.github.aistomin", mine.get(0).group().name()
         );
     }
 }

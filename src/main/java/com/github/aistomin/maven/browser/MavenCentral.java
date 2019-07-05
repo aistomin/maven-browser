@@ -37,6 +37,11 @@ import org.json.simple.parser.JSONParser;
 public final class MavenCentral implements MvnRepo {
 
     /**
+     * Default max amount of rows that query will return.
+     */
+    public static final int MAX_ROWS = 20;
+
+    /**
      * The Maven repo base URL.
      */
     private final String repo;
@@ -58,6 +63,11 @@ public final class MavenCentral implements MvnRepo {
     }
 
     @Override
+    public List<MvnArtifact> findArtifacts(final String str) throws Exception {
+        return this.findArtifacts(str, 0, MavenCentral.MAX_ROWS);
+    }
+
+    @Override
     public List<MvnArtifact> findArtifacts(
         final String str, final Integer start, final Integer rows
     ) throws Exception {
@@ -76,12 +86,8 @@ public final class MavenCentral implements MvnRepo {
         ).get("docs");
         return new ArrayList<JSONObject>(docs)
             .stream()
-            .map(
-                json -> new MavenArtifact(
-                    (String) json.get("a"),
-                    new MavenGroup((String) json.get("g"))
-                )
-            ).collect(Collectors.toList());
+            .map(MavenArtifact::new)
+            .collect(Collectors.toList());
     }
 
     @Override

@@ -25,6 +25,15 @@ import java.util.List;
 public interface MvnRepo {
 
     /**
+     * Search for the artifacts. Returns first 20 found artifacts.
+     *
+     * @param str The search string. It may be a part of group or artifact name.
+     * @return The list of the found artifacts.
+     * @throws Exception If the problem occurred while reading from the repo.
+     */
+    List<MvnArtifact> findArtifacts(String str) throws Exception;
+
+    /**
      * Search for the artifacts.
      *
      * @param str The search string. It may be a part of group or artifact name.

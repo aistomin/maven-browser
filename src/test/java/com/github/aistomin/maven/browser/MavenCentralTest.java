@@ -92,7 +92,7 @@ public final class MavenCentralTest {
     @Test
     void testFindVersions() throws Exception {
         final List<MvnArtifactVersion> versions =
-            new MavenCentral().findVersions(this.mine, 0, 20);
+            new MavenCentral().findVersions(this.mine);
         Assertions.assertEquals(MavenCentralTest.FIVE, versions.size());
         final String oone = "0.1";
         final String ootwo = "0.0.2";

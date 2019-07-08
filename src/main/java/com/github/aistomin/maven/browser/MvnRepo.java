@@ -47,6 +47,15 @@ public interface MvnRepo {
     ) throws Exception;
 
     /**
+     * Search for the versions of the artifact. Returns first 20 found versions.
+     *
+     * @param artifact The artifact.
+     * @return The list of the found versions of the artifact.
+     * @throws Exception If the problem occurred while reading from the repo.
+     */
+    List<MvnArtifactVersion> findVersions(MvnArtifact artifact) throws Exception;
+
+    /**
      * Search for the versions of the artifact.
      *
      * @param artifact The artifact.

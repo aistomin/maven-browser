@@ -93,6 +93,13 @@ public final class MavenCentral implements MvnRepo {
 
     @Override
     public List<MvnArtifactVersion> findVersions(
+        final MvnArtifact artifact
+    ) throws Exception {
+        return this.findVersions(artifact, 0, MavenCentral.MAX_ROWS);
+    }
+
+    @Override
+    public List<MvnArtifactVersion> findVersions(
         final MvnArtifact artifact, final Integer start, final Integer rows
     ) throws Exception {
         final String res = IOUtils.toString(

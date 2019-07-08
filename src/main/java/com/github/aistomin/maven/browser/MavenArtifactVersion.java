@@ -15,6 +15,8 @@
  */
 package com.github.aistomin.maven.browser;
 
+import org.json.simple.JSONObject;
+
 /**
  * Simple implementation of the Maven artifact's version entity.
  *
@@ -48,6 +50,20 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     ) {
         this.art = artifact;
         this.ver = version;
+    }
+
+    /**
+     * Ctor.
+     *
+     * @param json JSON object.
+     */
+    public MavenArtifactVersion(final JSONObject json) {
+        this(
+            new MavenArtifact(
+                (String) json.get("a"),
+                new MavenGroup((String) json.get("g"))
+            ), (String) json.get("v")
+        );
     }
 
     @Override

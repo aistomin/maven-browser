@@ -15,6 +15,7 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,14 @@ public final class MavenCentralTest {
     /**
      * The size of the part which we load later to compare with total.
      */
-    public static final int PART = 5;
+    public static final int FIVE = 5;
+
+    /**
+     * My previously created artifact which we can use for tests.
+     */
+    private final MvnArtifact mine = new MavenArtifact(
+        "jenkins-sdk", new MavenGroup("com.github.aistomin")
+    );
 
     /**
      * Check that we correctly find the artifacts with start and rows
@@ -59,20 +67,53 @@ public final class MavenCentralTest {
         );
         final int start = 2;
         final List<MvnArtifact> part = mvn.findArtifacts(
-            search, start, MavenCentralTest.PART
+            search, start, MavenCentralTest.FIVE
         );
-        Assertions.assertEquals(MavenCentralTest.PART, part.size());
+        Assertions.assertEquals(MavenCentralTest.FIVE, part.size());
         part.forEach(
             artifact ->
                 Assertions.assertEquals(
                     part.indexOf(artifact), artifacts.indexOf(artifact) - start
                 )
         );
-        final List<MvnArtifact> mine = mvn.findArtifacts("aistomin");
-        Assertions.assertEquals(1, mine.size());
-        Assertions.assertEquals("jenkins-sdk", mine.get(0).name());
+        final List<MvnArtifact> found = mvn.findArtifacts("aistomin");
+        Assertions.assertEquals(1, found.size());
+        Assertions.assertEquals(this.mine.name(), found.get(0).name());
         Assertions.assertEquals(
-            "com.github.aistomin", mine.get(0).group().name()
+            this.mine.group().name(), found.get(0).group().name()
         );
+    }
+
+    /**
+     * Check that we correctly find the versions of the artifact.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersions() throws Exception {
+        final List<MvnArtifactVersion> versions =
+            new MavenCentral().findVersions(this.mine, 0, 20);
+        Assertions.assertEquals(MavenCentralTest.FIVE, versions.size());
+        final String oone = "0.1";
+        final String ootwo = "0.0.2";
+        final List<String> expected = Arrays.asList(
+            "0.2.1",
+            "0.2",
+            oone,
+            ootwo,
+            "0.0.1"
+        );
+        for (final MvnArtifactVersion ver : versions) {
+            Assertions.assertEquals(this.mine.name(), ver.artifact().name());
+            Assertions.assertEquals(
+                this.mine.group().name(), ver.artifact().group().name()
+            );
+            Assertions.assertTrue(expected.contains(ver.name()));
+        }
+        final List<MvnArtifactVersion> reduced =
+            new MavenCentral().findVersions(this.mine, 2, 2);
+        Assertions.assertEquals(2, reduced.size());
+        Assertions.assertEquals(oone, reduced.get(0).name());
+        Assertions.assertEquals(ootwo, reduced.get(1).name());
     }
 }

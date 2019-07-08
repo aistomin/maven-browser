@@ -24,12 +24,12 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * The class which works with Maven Central repository.
  * URL: https://search.maven.org/
  *
- * @todo: Issue #10. Let's implement it and remove this todo.
  * @todo: Issue #11. Let's implement it and remove this todo.
  * @todo: Issue #12. Let's implement it and remove this todo.
  * @since 0.1
@@ -40,6 +40,11 @@ public final class MavenCentral implements MvnRepo {
      * Default max amount of rows that query will return.
      */
     public static final int MAX_ROWS = 20;
+
+    /**
+     * HTTP request encoding.
+     */
+    public static final String ENCODING = "UTF-8";
 
     /**
      * The Maven repo base URL.
@@ -59,7 +64,7 @@ public final class MavenCentral implements MvnRepo {
      * Ctor.
      */
     public MavenCentral() {
-        this("https://search.maven.org");
+        this("https://search.maven.org/solrsearch/select");
     }
 
     @Override
@@ -74,17 +79,13 @@ public final class MavenCentral implements MvnRepo {
         final String result = IOUtils.toString(
             URI.create(
                 String.format(
-                    "%s/solrsearch/select?q=%s&start=%d&rows=%d&wt=json",
+                    "%s?q=%s&start=%d&rows=%d&wt=json",
                     this.repo, str, start, rows
                 )
             ),
-            "UTF-8"
+            MavenCentral.ENCODING
         );
-        final JSONArray docs = (JSONArray) (
-            (JSONObject) ((JSONObject) new JSONParser().parse(result))
-                .get("response")
-        ).get("docs");
-        return new ArrayList<JSONObject>(docs)
+        return new ArrayList<JSONObject>(MavenCentral.parseResponse(result))
             .stream()
             .map(MavenArtifact::new)
             .collect(Collectors.toList());
@@ -92,11 +93,25 @@ public final class MavenCentral implements MvnRepo {
 
     @Override
     public List<MvnArtifactVersion> findVersions(
-        final MvnArtifact artifact, final Integer indent, final Integer rows
-    ) {
-        throw new NotImplementedException(
-            "The method MavenCentral.findVersions() is not implemented."
+        final MvnArtifact artifact, final Integer start, final Integer rows
+    ) throws Exception {
+        final String res = IOUtils.toString(
+            URI.create(
+                String.format(
+                    "%s?q=g:%s+AND+a:%s&core=gav&start=%d&rows=%d&wt=json",
+                    this.repo,
+                    artifact.group().name(),
+                    artifact.name(),
+                    start,
+                    rows
+                )
+            ),
+            MavenCentral.ENCODING
         );
+        return new ArrayList<JSONObject>(MavenCentral.parseResponse(res))
+            .stream()
+            .map(MavenArtifactVersion::new)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -115,5 +130,20 @@ public final class MavenCentral implements MvnRepo {
         throw new NotImplementedException(
             "The method MavenCentral.findVersionsOlderThan is not implemented."
         );
+    }
+
+    /**
+     * Get the list of artifacts/versions from the Maven repo response.
+     * @param response Maven repo response.
+     * @return The list of JSON objects.
+     * @throws ParseException If parsing wasn't successful.
+     */
+    private static JSONArray parseResponse(
+        final String response
+    ) throws ParseException {
+        return (JSONArray) (
+            (JSONObject) ((JSONObject) new JSONParser().parse(response))
+                .get("response")
+        ).get("docs");
     }
 }

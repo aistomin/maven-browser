@@ -50,13 +50,14 @@ public interface MvnRepo {
      * Search for the versions of the artifact.
      *
      * @param artifact The artifact.
-     * @param indent Indent of the search.
+     * @param start Indent of the search.
      * @param rows The max amount of results.
      * @return The list of the found versions of the artifact.
+     * @throws Exception If the problem occurred while reading from the repo.
      */
     List<MvnArtifactVersion> findVersions(
-        MvnArtifact artifact, Integer indent, Integer rows
-    );
+        MvnArtifact artifact, Integer start, Integer rows
+    ) throws Exception;
 
     /**
      * Search for all the versions of the artifact which are newer than provided

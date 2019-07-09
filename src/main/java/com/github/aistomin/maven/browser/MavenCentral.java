@@ -18,9 +18,9 @@ package com.github.aistomin.maven.browser;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -30,7 +30,6 @@ import org.json.simple.parser.ParseException;
  * The class which works with Maven Central repository.
  * URL: https://search.maven.org/
  *
- * @todo: Issue #12. Let's implement it and remove this todo.
  * @since 0.1
  */
 public final class MavenCentral implements MvnRepo {
@@ -124,24 +123,43 @@ public final class MavenCentral implements MvnRepo {
     public List<MvnArtifactVersion> findVersionsNewerThan(
         final MvnArtifactVersion version
     ) throws Exception {
-        return this.findVersions(version.artifact(), 0, Integer.MAX_VALUE)
-            .stream()
-            .filter(
-                ver ->  ver.releaseTimestamp() > version.releaseTimestamp()
-            ).collect(Collectors.toList());
+        return this.findArtifactVersionsWithFilter(
+            version.artifact(),
+            ver -> ver.releaseTimestamp() > version.releaseTimestamp()
+        );
     }
 
     @Override
     public List<MvnArtifactVersion> findVersionsOlderThan(
         final MvnArtifactVersion version
-    ) {
-        throw new NotImplementedException(
-            "The method MavenCentral.findVersionsOlderThan is not implemented."
+    ) throws Exception {
+        return this.findArtifactVersionsWithFilter(
+            version.artifact(),
+            ver -> ver.releaseTimestamp() < version.releaseTimestamp()
         );
     }
 
     /**
+     * Find all the versions of the artifact with filter.
+     *
+     * @param artifact The artifact.
+     * @param predicate The filter.
+     * @return The list of the found versions.
+     * @throws Exception If the problem occurred while reading from the repo.
+     */
+    private List<MvnArtifactVersion> findArtifactVersionsWithFilter(
+        final MvnArtifact artifact,
+        final Predicate<MvnArtifactVersion> predicate
+    ) throws Exception {
+        return this.findVersions(artifact, 0, Integer.MAX_VALUE)
+            .stream()
+            .filter(predicate)
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Get the list of artifacts/versions from the Maven repo response.
+     *
      * @param response Maven repo response.
      * @return The list of JSON objects.
      * @throws ParseException If parsing wasn't successful.

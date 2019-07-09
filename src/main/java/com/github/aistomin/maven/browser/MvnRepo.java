@@ -86,6 +86,9 @@ public interface MvnRepo {
      *
      * @param version The version.
      * @return The list of the older versions.
+     * @throws Exception If the problem occurred while reading from the repo.
      */
-    List<MvnArtifactVersion> findVersionsOlderThan(MvnArtifactVersion version);
+    List<MvnArtifactVersion> findVersionsOlderThan(
+        MvnArtifactVersion version
+    ) throws Exception;
 }

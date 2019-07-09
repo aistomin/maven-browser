@@ -150,4 +150,30 @@ public final class MavenCentralTest {
         Assertions.assertEquals(this.vers.get(1), newer.get(1).name());
         Assertions.assertEquals(this.vers.get(2), newer.get(2).name());
     }
+
+    /**
+     * Check that we correctly find the versions which are older than provided
+     * one.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsOlderThan() throws Exception {
+        final MvnRepo mvn = new MavenCentral();
+        final MvnArtifactVersion version = mvn.findVersions(this.mine)
+            .stream()
+            .filter(
+                ver ->
+                    this.vers.get(2).equals(ver.name())
+            ).findFirst().get();
+        final List<MvnArtifactVersion> older =
+            mvn.findVersionsOlderThan(version);
+        Assertions.assertEquals(2, older.size());
+        Assertions.assertEquals(
+            this.vers.get(this.vers.size() - 2), older.get(0).name()
+        );
+        Assertions.assertEquals(
+            this.vers.get(this.vers.size() - 1), older.get(1).name()
+        );
+    }
 }

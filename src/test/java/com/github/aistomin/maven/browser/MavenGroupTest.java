@@ -43,8 +43,8 @@ public final class MavenGroupTest {
     @Test
     void testEqualsAndHashCode() {
         final String group = UUID.randomUUID().toString();
-        final MavenGroup first = new MavenGroup(group);
-        final MavenGroup second = new MavenGroup(group);
+        final MvnGroup first = new MavenGroup(group);
+        final MvnGroup second = new MavenGroup(group);
         Assertions.assertEquals(first, second);
         Assertions.assertEquals(
             1, new HashSet<>(Arrays.asList(first, second)).size()

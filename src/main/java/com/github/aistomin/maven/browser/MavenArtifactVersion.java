@@ -67,10 +67,8 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
      */
     public MavenArtifactVersion(final JSONObject json) {
         this(
-            new MavenArtifact(
-                (String) json.get("a"),
-                new MavenGroup((String) json.get("g"))
-            ), (String) json.get("v"), (Long) json.get("timestamp")
+            new MavenArtifact(json),
+            (String) json.get("v"), (Long) json.get("timestamp")
         );
     }
 

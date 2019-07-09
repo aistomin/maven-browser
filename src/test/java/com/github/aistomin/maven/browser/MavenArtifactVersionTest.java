@@ -34,8 +34,8 @@ public final class MavenArtifactVersionTest {
     @Test
     void testConstruct() {
         final MvnArtifact artifact = new MavenArtifact(
-            UUID.randomUUID().toString(),
-            new MavenGroup(UUID.randomUUID().toString())
+            new MavenGroup(UUID.randomUUID().toString()),
+            UUID.randomUUID().toString()
         );
         final String name = UUID.randomUUID().toString();
         final MvnArtifactVersion version = new MavenArtifactVersion(
@@ -53,14 +53,14 @@ public final class MavenArtifactVersionTest {
         final String group = UUID.randomUUID().toString();
         final String artifact = UUID.randomUUID().toString();
         final String version = UUID.randomUUID().toString();
-        final MavenArtifactVersion first = new MavenArtifactVersion(
+        final MvnArtifactVersion first = new MavenArtifactVersion(
             new MavenArtifact(
-                artifact, new MavenGroup(group)
+                new MavenGroup(group), artifact
             ), version, System.currentTimeMillis()
         );
-        final MavenArtifactVersion second = new MavenArtifactVersion(
+        final MvnArtifactVersion second = new MavenArtifactVersion(
             new MavenArtifact(
-                artifact, new MavenGroup(group)
+                new MavenGroup(group), artifact
             ), version, System.currentTimeMillis()
         );
         Assertions.assertEquals(first, second);

@@ -41,7 +41,7 @@ public final class MavenCentralTest {
      * My previously created artifact which we can use for tests.
      */
     private final MvnArtifact mine = new MavenArtifact(
-        "jenkins-sdk", new MavenGroup("com.github.aistomin")
+        new MavenGroup("com.github.aistomin"), "jenkins-sdk"
     );
 
     /**
@@ -63,7 +63,7 @@ public final class MavenCentralTest {
      */
     @Test
     void testFindArtifacts() throws Exception {
-        final MavenCentral mvn = new MavenCentral();
+        final MvnRepo mvn = new MavenCentral();
         final String search = "guice";
         final List<MvnArtifact> artifacts = mvn.findArtifacts(
             search, 0, MavenCentral.MAX_ROWS
@@ -136,7 +136,7 @@ public final class MavenCentralTest {
      */
     @Test
     void testFindVersionsNewerThan() throws Exception {
-        final MavenCentral mvn = new MavenCentral();
+        final MvnRepo mvn = new MavenCentral();
         final MvnArtifactVersion version = mvn.findVersions(this.mine)
             .stream()
             .filter(

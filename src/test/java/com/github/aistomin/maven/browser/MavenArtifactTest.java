@@ -35,7 +35,7 @@ public final class MavenArtifactTest {
     void testConstruct() {
         final String name = UUID.randomUUID().toString();
         final MvnGroup group = new MavenGroup(UUID.randomUUID().toString());
-        final MvnArtifact artifact = new MavenArtifact(name, group);
+        final MvnArtifact artifact = new MavenArtifact(group, name);
         Assertions.assertEquals(name, artifact.name());
         Assertions.assertEquals(group, artifact.group());
     }
@@ -47,11 +47,11 @@ public final class MavenArtifactTest {
     void testEqualsAndHashCode() {
         final String group = UUID.randomUUID().toString();
         final String artifact = UUID.randomUUID().toString();
-        final MavenArtifact first = new MavenArtifact(
-            artifact, new MavenGroup(group)
+        final MvnArtifact first = new MavenArtifact(
+            new MavenGroup(group), artifact
         );
-        final MavenArtifact second = new MavenArtifact(
-            artifact, new MavenGroup(group)
+        final MvnArtifact second = new MavenArtifact(
+            new MavenGroup(group), artifact
         );
         Assertions.assertEquals(first, second);
         Assertions.assertEquals(

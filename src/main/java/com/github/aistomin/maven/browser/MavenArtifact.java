@@ -42,10 +42,10 @@ public final class MavenArtifact implements MvnArtifact {
     /**
      * Ctor.
      *
-     * @param name The artifact's name.
      * @param group The artifact's group.
+     * @param name The artifact's name.
      */
-    public MavenArtifact(final String name, final MvnGroup group) {
+    public MavenArtifact(final MvnGroup group, final String name) {
         this.artifact = name;
         this.grp = group;
     }
@@ -57,8 +57,8 @@ public final class MavenArtifact implements MvnArtifact {
      */
     public MavenArtifact(final JSONObject json) {
         this(
-            (String) json.get("a"),
-            new MavenGroup((String) json.get("g"))
+            new MavenGroup((String) json.get("g")),
+            (String) json.get("a")
         );
     }
 

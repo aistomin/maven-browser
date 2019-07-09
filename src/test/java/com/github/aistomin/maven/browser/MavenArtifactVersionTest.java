@@ -39,7 +39,7 @@ public final class MavenArtifactVersionTest {
         );
         final String name = UUID.randomUUID().toString();
         final MvnArtifactVersion version = new MavenArtifactVersion(
-            artifact, name
+            artifact, name, System.currentTimeMillis()
         );
         Assertions.assertEquals(name, version.name());
         Assertions.assertEquals(artifact, version.artifact());
@@ -56,12 +56,12 @@ public final class MavenArtifactVersionTest {
         final MavenArtifactVersion first = new MavenArtifactVersion(
             new MavenArtifact(
                 artifact, new MavenGroup(group)
-            ), version
+            ), version, System.currentTimeMillis()
         );
         final MavenArtifactVersion second = new MavenArtifactVersion(
             new MavenArtifact(
                 artifact, new MavenGroup(group)
-            ), version
+            ), version, System.currentTimeMillis()
         );
         Assertions.assertEquals(first, second);
         Assertions.assertEquals(

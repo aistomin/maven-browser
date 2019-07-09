@@ -28,15 +28,31 @@ import org.junit.jupiter.api.Test;
 public final class MavenCentralTest {
 
     /**
-     * The size of the part which we load later to compare with total.
+     * Five.
      */
     public static final int FIVE = 5;
+
+    /**
+     * Three.
+     */
+    public static final int THREE = 3;
 
     /**
      * My previously created artifact which we can use for tests.
      */
     private final MvnArtifact mine = new MavenArtifact(
         "jenkins-sdk", new MavenGroup("com.github.aistomin")
+    );
+
+    /**
+     * The list of the versions of my artifact which we use for this test.
+     */
+    private final List<String> vers = Arrays.asList(
+        "0.2.1",
+        "0.2",
+        "0.1",
+        "0.0.2",
+        "0.0.1"
     );
 
     /**
@@ -94,26 +110,44 @@ public final class MavenCentralTest {
         final List<MvnArtifactVersion> versions =
             new MavenCentral().findVersions(this.mine);
         Assertions.assertEquals(MavenCentralTest.FIVE, versions.size());
-        final String oone = "0.1";
-        final String ootwo = "0.0.2";
-        final List<String> expected = Arrays.asList(
-            "0.2.1",
-            "0.2",
-            oone,
-            ootwo,
-            "0.0.1"
-        );
         for (final MvnArtifactVersion ver : versions) {
             Assertions.assertEquals(this.mine.name(), ver.artifact().name());
             Assertions.assertEquals(
                 this.mine.group().name(), ver.artifact().group().name()
             );
-            Assertions.assertTrue(expected.contains(ver.name()));
+            Assertions.assertTrue(this.vers.contains(ver.name()));
         }
         final List<MvnArtifactVersion> reduced =
-            new MavenCentral().findVersions(this.mine, 2, 2);
+            new MavenCentral().findVersions(this.mine, 1, 2);
         Assertions.assertEquals(2, reduced.size());
-        Assertions.assertEquals(oone, reduced.get(0).name());
-        Assertions.assertEquals(ootwo, reduced.get(1).name());
+        Assertions.assertEquals(
+            this.vers.get(1), reduced.get(0).name()
+        );
+        Assertions.assertEquals(
+            this.vers.get(2), reduced.get(1).name()
+        );
+    }
+
+    /**
+     * Check that we correctly find the versions which are newer than provided
+     * one.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsNewerThan() throws Exception {
+        final MavenCentral mvn = new MavenCentral();
+        final MvnArtifactVersion version = mvn.findVersions(this.mine)
+            .stream()
+            .filter(
+                ver ->
+                    this.vers.get(this.vers.size() - 2).equals(ver.name())
+            ).findFirst().get();
+        final List<MvnArtifactVersion> newer =
+            mvn.findVersionsNewerThan(version);
+        Assertions.assertEquals(MavenCentralTest.THREE, newer.size());
+        Assertions.assertEquals(this.vers.get(0), newer.get(0).name());
+        Assertions.assertEquals(this.vers.get(1), newer.get(1).name());
+        Assertions.assertEquals(this.vers.get(2), newer.get(2).name());
     }
 }

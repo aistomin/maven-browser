@@ -40,16 +40,24 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     private final String ver;
 
     /**
+     * The timestamp when the version was released.
+     */
+    private final Long release;
+
+    /**
      * Ctor.
      *
      * @param artifact Maven artifact.
      * @param version Maven artifact version.
+     * @param timestamp The timestamp when the version was released.
      */
     public MavenArtifactVersion(
-        final MvnArtifact artifact, final String version
+        final MvnArtifact artifact, final String version,
+        final Long timestamp
     ) {
         this.art = artifact;
         this.ver = version;
+        this.release = timestamp;
     }
 
     /**
@@ -62,7 +70,7 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
             new MavenArtifact(
                 (String) json.get("a"),
                 new MavenGroup((String) json.get("g"))
-            ), (String) json.get("v")
+            ), (String) json.get("v"), (Long) json.get("timestamp")
         );
     }
 
@@ -74,6 +82,11 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     @Override
     public String name() {
         return this.ver;
+    }
+
+    @Override
+    public Long releaseTimestamp() {
+        return this.release;
     }
 
     @Override

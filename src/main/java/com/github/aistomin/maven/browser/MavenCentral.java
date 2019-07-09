@@ -30,7 +30,6 @@ import org.json.simple.parser.ParseException;
  * The class which works with Maven Central repository.
  * URL: https://search.maven.org/
  *
- * @todo: Issue #11. Let's implement it and remove this todo.
  * @todo: Issue #12. Let's implement it and remove this todo.
  * @since 0.1
  */
@@ -124,10 +123,12 @@ public final class MavenCentral implements MvnRepo {
     @Override
     public List<MvnArtifactVersion> findVersionsNewerThan(
         final MvnArtifactVersion version
-    ) {
-        throw new NotImplementedException(
-            "The method MavenCentral.findVersionsNewerThan is not implemented."
-        );
+    ) throws Exception {
+        return this.findVersions(version.artifact(), 0, Integer.MAX_VALUE)
+            .stream()
+            .filter(
+                ver ->  ver.releaseTimestamp() > version.releaseTimestamp()
+            ).collect(Collectors.toList());
     }
 
     @Override

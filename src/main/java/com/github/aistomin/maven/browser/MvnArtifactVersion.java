@@ -35,4 +35,11 @@ public interface MvnArtifactVersion {
      * @return The name of the version.
      */
     String name();
+
+    /**
+     * The timestamp when the version was released.
+     *
+     * @return The timestamp.
+     */
+    Long releaseTimestamp();
 }

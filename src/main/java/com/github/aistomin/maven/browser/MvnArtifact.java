@@ -35,4 +35,11 @@ public interface MvnArtifact {
      * @return The name of the artifact.
      */
     String name();
+
+    /**
+     * Artifact's identifier. Normally it looks like "group_name:artifact_name".
+     *
+     * @return The artifact's identifier.
+     */
+    String identifier();
 }

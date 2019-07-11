@@ -42,4 +42,12 @@ public interface MvnArtifactVersion {
      * @return The timestamp.
      */
     Long releaseTimestamp();
+
+    /**
+     * Artifact's version identifier. Normally it looks like
+     * "group_name:artifact_name:version".
+     *
+     * @return The version's identifier.
+     */
+    String identifier();
 }

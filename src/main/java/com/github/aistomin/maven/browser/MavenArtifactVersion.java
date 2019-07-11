@@ -88,6 +88,13 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     }
 
     @Override
+    public String identifier() {
+        return String.format(
+            "%s:%s", this.artifact().identifier(), this.name()
+        );
+    }
+
+    @Override
     public boolean equals(final Object obj) {
         return this == obj
             || obj != null
@@ -100,5 +107,10 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     public int hashCode() {
         return MavenArtifactVersion.MAGIC_NUMBER * this.art.hashCode()
             + this.ver.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return this.identifier();
     }
 }

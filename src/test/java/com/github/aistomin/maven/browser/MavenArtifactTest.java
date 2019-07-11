@@ -58,4 +58,17 @@ public final class MavenArtifactTest {
             1, new HashSet<>(Arrays.asList(first, second)).size()
         );
     }
+
+    /**
+     * Check that we properly convert the entity to string.
+     */
+    @Test
+    void testToString() {
+        final String group = UUID.randomUUID().toString();
+        final String artifact = UUID.randomUUID().toString();
+        Assertions.assertEquals(
+            String.format("%s:%s", group, artifact),
+            new MavenArtifact(new MavenGroup(group), artifact).toString()
+        );
+    }
 }

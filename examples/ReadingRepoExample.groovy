@@ -17,11 +17,11 @@ final artifacts =
     repository.findArtifacts('aistomin')
 println ('The following artifact were found:')
 artifacts.each { artifact ->
-    println("${artifact.group().name()}:${artifact.name()}")
+    println(artifact.identifier())
 }
 final artifact = artifacts.get(0)
 println(
-    "Artifact ${artifact.group().name()}:${artifact.name()} has the following versions:"
+    "Artifact ${artifact.identifier()} has the following versions:"
 )
 final versions =
     repository.findVersions(artifact)

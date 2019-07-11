@@ -68,4 +68,23 @@ public final class MavenArtifactVersionTest {
             1, new HashSet<>(Arrays.asList(first, second)).size()
         );
     }
+
+    /**
+     * Check that we properly convert the entity to string.
+     */
+    @Test
+    void testToString() {
+        final String group = UUID.randomUUID().toString();
+        final String artifact = UUID.randomUUID().toString();
+        final String version = UUID.randomUUID().toString();
+        Assertions.assertEquals(
+            String.format("%s:%s:%s", group, artifact, version),
+            new MavenArtifactVersion(
+                new MavenArtifact(
+                    new MavenGroup(group),
+                    artifact
+                ), version, System.currentTimeMillis()
+            ).toString()
+        );
+    }
 }

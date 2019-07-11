@@ -15,6 +15,8 @@
  */
 package com.github.aistomin.maven.browser;
 
+import org.json.simple.JSONObject;
+
 /**
  * Simple implementation of the Maven group entity.
  *
@@ -36,6 +38,15 @@ public final class MavenGroup implements MvnGroup {
         this.group = name;
     }
 
+    /**
+     * Ctor.
+     *
+     * @param json JSON object.
+     */
+    public MavenGroup(final JSONObject json) {
+        this((String) json.get("g"));
+    }
+
     @Override
     public String name() {
         return this.group;
@@ -52,5 +63,10 @@ public final class MavenGroup implements MvnGroup {
     @Override
     public int hashCode() {
         return this.group.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return this.group;
     }
 }

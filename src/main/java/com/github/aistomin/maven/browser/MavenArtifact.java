@@ -56,10 +56,7 @@ public final class MavenArtifact implements MvnArtifact {
      * @param json JSON object.
      */
     public MavenArtifact(final JSONObject json) {
-        this(
-            new MavenGroup((String) json.get("g")),
-            (String) json.get("a")
-        );
+        this(new MavenGroup(json), (String) json.get("a"));
     }
 
     @Override
@@ -70,6 +67,11 @@ public final class MavenArtifact implements MvnArtifact {
     @Override
     public String name() {
         return this.artifact;
+    }
+
+    @Override
+    public String identifier() {
+        return String.format("%s:%s", this.group().name(), this.name());
     }
 
     @Override
@@ -85,5 +87,10 @@ public final class MavenArtifact implements MvnArtifact {
     public int hashCode() {
         return MavenArtifact.MAGIC_NUMBER * this.artifact.hashCode()
             + this.grp.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return this.identifier();
     }
 }

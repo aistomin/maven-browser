@@ -1,11 +1,10 @@
 # maven-browser
 [![Build Status](https://travis-ci.org/aistomin/maven-browser.svg?branch=master)](https://travis-ci.org/aistomin/maven-browser)
 
-Java library which allows to browse the central Maven repository. It is a number
-of classes which use [Maven Central API](https://search.maven.org/classic/#api)
-to retrieve the data from the repository. This library can be useful for 
-developers who create a CI scripts or other environmental software that needs to
-read information from Maven repository.
+This Java library allows to browse the Maven Central repository. It uses 
+[Maven Central API](https://search.maven.org/classic/#api) to retrieve the data from the
+repository. The tool can be useful for developers who create a CI scripts or other 
+environmental software that needs to read information from Maven repository.
 
 ## Getting Started
 

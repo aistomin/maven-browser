@@ -93,10 +93,12 @@ public final class MavenCentralTest {
                 )
         );
         final List<MvnArtifact> found = mvn.findArtifacts("aistomin");
-        Assertions.assertEquals(1, found.size());
-        Assertions.assertEquals(this.mine.name(), found.get(0).name());
-        Assertions.assertEquals(
-            this.mine.group().name(), found.get(0).group().name()
+        Assertions.assertEquals(2, found.size());
+        Assertions.assertNotNull(
+            found.stream()
+                .filter(artifact -> artifact.equals(this.mine))
+                .findFirst()
+                .get()
         );
     }
 

@@ -95,6 +95,11 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     }
 
     @Override
+    public MvnDependency dependency() {
+        return new MavenDependency(this);
+    }
+
+    @Override
     public boolean equals(final Object obj) {
         return this == obj
             || obj != null

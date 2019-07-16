@@ -50,4 +50,11 @@ public interface MvnArtifactVersion {
      * @return The version's identifier.
      */
     String identifier();
+
+    /**
+     * Artifact's version dependency.
+     *
+     * @return The dependency.
+     */
+    MvnDependency dependency();
 }

@@ -79,6 +79,23 @@ public final class MavenDependencyTest {
     }
 
     /**
+     * Check that we correctly convert dependency to the Apache Ivy
+     * dependency format.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testForIvy() throws Exception {
+        Assertions.assertEquals(
+            String.format(
+                "<dependency org=%s name=%s rev=%s />",
+                "\"com.github.aistomin\"", "\"jenkins-sdk\"", "\"0.2.1\""
+            ),
+            this.dependency().forIvy()
+        );
+    }
+
+    /**
      * Load test dependency.
      *
      * @return Test dependency.

@@ -23,7 +23,6 @@ import org.apache.commons.lang3.NotImplementedException;
 /**
  * Simple implementation of the Maven artifact version's dependency entity.
  *
- * @todo: Issue #42. Let's solve the issue and remove this todo.
  * @todo: Issue #43. Let's solve the issue and remove this todo.
  * @todo: Issue #44. Let's solve the issue and remove this todo.
  * @todo: Issue #45. Let's solve the issue and remove this todo.
@@ -78,8 +77,11 @@ public final class MavenDependency implements MvnDependency {
 
     @Override
     public String forIvy() {
-        throw new NotImplementedException(
-            "The method forIvy() is not implemented."
+        return String.format(
+            "<dependency org=\"%s\" name=\"%s\" rev=\"%s\" />",
+            this.ver.artifact().group().name(),
+            this.ver.artifact().name(),
+            this.ver.name()
         );
     }
 

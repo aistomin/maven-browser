@@ -18,12 +18,10 @@ package com.github.aistomin.maven.browser;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * Simple implementation of the Maven artifact version's dependency entity.
  *
- * @todo: Issue #45. Let's solve the issue and remove this todo.
  * @since 1.0
  */
 public final class MavenDependency implements MvnDependency {
@@ -121,8 +119,10 @@ public final class MavenDependency implements MvnDependency {
 
     @Override
     public String forLeiningen() {
-        throw new NotImplementedException(
-            "The method forLeiningen() is not implemented."
+        final MvnArtifact artifact = this.ver.artifact();
+        return String.format(
+            "[%s/%s \"%s\"]", artifact.group().name(), artifact.name(),
+            this.ver.name()
         );
     }
 }

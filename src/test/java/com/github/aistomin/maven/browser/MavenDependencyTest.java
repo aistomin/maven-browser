@@ -131,6 +131,20 @@ public final class MavenDependencyTest {
     }
 
     /**
+     * Check that we correctly convert dependency to the Leiningen
+     * dependency format.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testForLeiningen() throws Exception {
+        Assertions.assertEquals(
+            "[com.github.aistomin/jenkins-sdk \"0.2.1\"]",
+            this.dependency().forLeiningen()
+        );
+    }
+
+    /**
      * Load test dependency.
      *
      * @return Test dependency.

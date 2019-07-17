@@ -113,6 +113,24 @@ public final class MavenDependencyTest {
     }
 
     /**
+     * Check that we correctly convert dependency to the Scala SBT
+     * dependency format.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testForScala() throws Exception {
+        Assertions.assertEquals(
+            String.format(
+                "%s%s",
+                "libraryDependencies += \"com.github.aistomin\"",
+                " % \"jenkins-sdk\" % \"0.2.1\""
+            ),
+            this.dependency().forScala()
+        );
+    }
+
+    /**
      * Load test dependency.
      *
      * @return Test dependency.

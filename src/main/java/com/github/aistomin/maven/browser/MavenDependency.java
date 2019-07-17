@@ -23,7 +23,6 @@ import org.apache.commons.lang3.NotImplementedException;
 /**
  * Simple implementation of the Maven artifact version's dependency entity.
  *
- * @todo: Issue #44. Let's solve the issue and remove this todo.
  * @todo: Issue #45. Let's solve the issue and remove this todo.
  * @since 1.0
  */
@@ -46,6 +45,7 @@ public final class MavenDependency implements MvnDependency {
     @Override
     public String forMaven() {
         try {
+            final MvnArtifact artifact = this.ver.artifact();
             return String.format(
                 FileUtils.readFileToString(
                     new File(
@@ -53,8 +53,8 @@ public final class MavenDependency implements MvnDependency {
                             .getResource("maven_dependency.template").getFile()
                     ), "UTF-8"
                 ),
-                this.ver.artifact().group().name(),
-                this.ver.artifact().name(),
+                artifact.group().name(),
+                artifact.name(),
                 this.ver.name()
             );
         } catch (final IOException unexpected) {
@@ -66,30 +66,33 @@ public final class MavenDependency implements MvnDependency {
 
     @Override
     public String forBuildr() {
+        final MvnArtifact artifact = this.ver.artifact();
         return String.format(
             "'%s:%s:jar:%s'",
-            this.ver.artifact().group().name(),
-            this.ver.artifact().name(),
+            artifact.group().name(),
+            artifact.name(),
             this.ver.name()
         );
     }
 
     @Override
     public String forIvy() {
+        final MvnArtifact artifact = this.ver.artifact();
         return String.format(
             "<dependency org=\"%s\" name=\"%s\" rev=\"%s\" />",
-            this.ver.artifact().group().name(),
-            this.ver.artifact().name(),
+            artifact.group().name(),
+            artifact.name(),
             this.ver.name()
         );
     }
 
     @Override
     public String forGroovyGrape() {
+        final MvnArtifact artifact = this.ver.artifact();
         return String.format(
             "@Grapes(%n  @Grab(group='%s', module='%s', version='%s')%n)",
-            this.ver.artifact().group().name(),
-            this.ver.artifact().name(),
+            artifact.group().name(),
+            artifact.name(),
             this.ver.name()
         );
     }
@@ -107,8 +110,12 @@ public final class MavenDependency implements MvnDependency {
 
     @Override
     public String forScala() {
-        throw new NotImplementedException(
-            "The method forScala() is not implemented."
+        final MvnArtifact artifact = this.ver.artifact();
+        return String.format(
+            "libraryDependencies += \"%s\" %% \"%s\" %% \"%s\"",
+            artifact.group().name(),
+            artifact.name(),
+            this.ver.name()
         );
     }
 

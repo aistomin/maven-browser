@@ -61,6 +61,24 @@ public final class MavenDependencyTest {
     }
 
     /**
+     * Check that we correctly convert dependency to the Apache Maven
+     * dependency format.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testForMaven() throws Exception {
+        Assertions.assertEquals(
+            String.format(
+                "<dependency>\n%s\n%s\n%s\n</dependency>",
+                "  <groupId>com.github.aistomin</groupId>",
+                "  <artifactId>jenkins-sdk</artifactId>",
+                "  <version>0.2.1</version>"
+            ), this.dependency().forMaven()
+        );
+    }
+
+    /**
      * Load test dependency.
      *
      * @return Test dependency.

@@ -1,0 +1,5 @@
+<dependency>
+  <groupId>%s</groupId>
+  <artifactId>%s</artifactId>
+  <version>%s</version>
+</dependency>

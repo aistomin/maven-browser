@@ -15,12 +15,14 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.io.File;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * Simple implementation of the Maven artifact version's dependency entity.
  *
- * @todo: Issue #41. Let's solve the issue and remove this todo.
  * @todo: Issue #42. Let's solve the issue and remove this todo.
  * @todo: Issue #43. Let's solve the issue and remove this todo.
  * @todo: Issue #44. Let's solve the issue and remove this todo.
@@ -45,9 +47,23 @@ public final class MavenDependency implements MvnDependency {
 
     @Override
     public String forMaven() {
-        throw new NotImplementedException(
-            "The method .forMaven() is not implemented."
-        );
+        try {
+            return String.format(
+                FileUtils.readFileToString(
+                    new File(
+                        Thread.currentThread().getContextClassLoader()
+                            .getResource("maven_dependency.template").getFile()
+                    ), "UTF-8"
+                ),
+                this.ver.artifact().group().name(),
+                this.ver.artifact().name(),
+                this.ver.name()
+            );
+        } catch (final IOException unexpected) {
+            throw new IllegalStateException(
+                "The error is totally unexpected.", unexpected
+            );
+        }
     }
 
     @Override

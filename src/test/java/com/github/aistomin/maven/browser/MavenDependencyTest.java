@@ -70,7 +70,7 @@ public final class MavenDependencyTest {
     void testForMaven() throws Exception {
         Assertions.assertEquals(
             String.format(
-                "<dependency>\n%s\n%s\n%s\n</dependency>",
+                "<dependency>%n%s%n%s%n%s%n</dependency>",
                 "  <groupId>com.github.aistomin</groupId>",
                 "  <artifactId>jenkins-sdk</artifactId>",
                 "  <version>0.2.1</version>"
@@ -92,6 +92,23 @@ public final class MavenDependencyTest {
                 "\"com.github.aistomin\"", "\"jenkins-sdk\"", "\"0.2.1\""
             ),
             this.dependency().forIvy()
+        );
+    }
+
+    /**
+     * Check that we correctly convert dependency to the Groovy Grape
+     * dependency format.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testForGroovyGrape() throws Exception {
+        Assertions.assertEquals(
+            String.format(
+                "@Grapes(\n  @Grab(group=%s, module=%s, version=%s)\n)",
+                "'com.github.aistomin'", "'jenkins-sdk'", "'0.2.1'"
+            ),
+            this.dependency().forGroovyGrape()
         );
     }
 

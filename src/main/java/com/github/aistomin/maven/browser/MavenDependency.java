@@ -23,7 +23,6 @@ import org.apache.commons.lang3.NotImplementedException;
 /**
  * Simple implementation of the Maven artifact version's dependency entity.
  *
- * @todo: Issue #43. Let's solve the issue and remove this todo.
  * @todo: Issue #44. Let's solve the issue and remove this todo.
  * @todo: Issue #45. Let's solve the issue and remove this todo.
  * @since 1.0
@@ -87,8 +86,11 @@ public final class MavenDependency implements MvnDependency {
 
     @Override
     public String forGroovyGrape() {
-        throw new NotImplementedException(
-            "The method forGroovyGrape() is not implemented."
+        return String.format(
+            "@Grapes(%n  @Grab(group='%s', module='%s', version='%s')%n)",
+            this.ver.artifact().group().name(),
+            this.ver.artifact().name(),
+            this.ver.name()
         );
     }
 

@@ -15,10 +15,6 @@
  */
 package com.github.aistomin.maven.browser;
 
-import java.io.File;
-import java.io.IOException;
-import org.apache.commons.io.FileUtils;
-
 /**
  * Simple implementation of the Maven artifact version's dependency entity.
  *
@@ -42,24 +38,13 @@ public final class MavenDependency implements MvnDependency {
 
     @Override
     public String forMaven() {
-        try {
-            final MvnArtifact artifact = this.ver.artifact();
-            return String.format(
-                FileUtils.readFileToString(
-                    new File(
-                        Thread.currentThread().getContextClassLoader()
-                            .getResource("maven_dependency.template").getFile()
-                    ), "UTF-8"
-                ),
-                artifact.group().name(),
-                artifact.name(),
-                this.ver.name()
-            );
-        } catch (final IOException unexpected) {
-            throw new IllegalStateException(
-                "The error is totally unexpected.", unexpected
-            );
-        }
+        final MvnArtifact artifact = this.ver.artifact();
+        return String.format(
+            "<dependency>%n%s%n%s%n%s%n</dependency>",
+            String.format("  <groupId>%s</groupId>", artifact.group().name()),
+            String.format("  <artifactId>%s</artifactId>", artifact.name()),
+            String.format("  <version>%s</version>", this.ver.name())
+        );
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.Arrays;
 import org.json.simple.JSONObject;
 
 /**
@@ -45,18 +46,42 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     private final Long release;
 
     /**
+     * Maven packaging type.
+     */
+    private final MvnPackagingType type;
+
+    /**
      * Ctor.
      *
      * @param artifact Maven artifact.
      * @param version Maven artifact version.
      * @param timestamp The timestamp when the version was released.
+     * @deprecated Use the constructor with "packaging" parameter instead.
      */
+    @Deprecated
     public MavenArtifactVersion(
         final MvnArtifact artifact, final String version,
         final Long timestamp
     ) {
+        this(artifact, version, MvnPackagingType.JAR, timestamp);
+    }
+
+    /**
+     * Ctor.
+     *
+     * @param artifact Maven artifact.
+     * @param version Maven artifact version.
+     * @param packaging Maven packaging type.
+     * @param timestamp The timestamp when the version was released.
+     * @checkstyle ParameterNumberCheck (10 lines)
+     */
+    public MavenArtifactVersion(
+        final MvnArtifact artifact, final String version,
+        final MvnPackagingType packaging, final Long timestamp
+    ) {
         this.art = artifact;
         this.ver = version;
+        this.type = packaging;
         this.release = timestamp;
     }
 
@@ -68,7 +93,12 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     public MavenArtifactVersion(final JSONObject json) {
         this(
             new MavenArtifact(json),
-            (String) json.get("v"), (Long) json.get("timestamp")
+            (String) json.get("v"),
+            Arrays.stream(MvnPackagingType.values())
+                .filter(
+                    item -> item.packaging().equals(json.get("p"))
+                ).findFirst().orElse(MvnPackagingType.JAR),
+            (Long) json.get("timestamp")
         );
     }
 
@@ -97,6 +127,11 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     @Override
     public MvnDependency dependency() {
         return new MavenDependency(this);
+    }
+
+    @Override
+    public MvnPackagingType packaging() {
+        return this.type;
     }
 
     @Override

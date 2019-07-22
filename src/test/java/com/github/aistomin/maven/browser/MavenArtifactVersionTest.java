@@ -17,6 +17,8 @@ package com.github.aistomin.maven.browser;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,11 +40,19 @@ public final class MavenArtifactVersionTest {
             UUID.randomUUID().toString()
         );
         final String name = UUID.randomUUID().toString();
-        final MvnArtifactVersion version = new MavenArtifactVersion(
+        final MvnArtifactVersion old = new MavenArtifactVersion(
             artifact, name, System.currentTimeMillis()
         );
-        Assertions.assertEquals(name, version.name());
-        Assertions.assertEquals(artifact, version.artifact());
+        Assertions.assertEquals(name, old.name());
+        Assertions.assertEquals(artifact, old.artifact());
+        final MvnPackagingType[] types = MvnPackagingType.values();
+        final MvnPackagingType type = types[new Random().nextInt(types.length)];
+        final MvnArtifactVersion modern = new MavenArtifactVersion(
+            artifact, name, type, System.currentTimeMillis()
+        );
+        Assertions.assertEquals(name, modern.name());
+        Assertions.assertEquals(artifact, modern.artifact());
+        Assertions.assertEquals(type, modern.packaging());
     }
 
     /**
@@ -56,12 +66,12 @@ public final class MavenArtifactVersionTest {
         final MvnArtifactVersion first = new MavenArtifactVersion(
             new MavenArtifact(
                 new MavenGroup(group), artifact
-            ), version, System.currentTimeMillis()
+            ), version, MvnPackagingType.JAR, System.currentTimeMillis()
         );
         final MvnArtifactVersion second = new MavenArtifactVersion(
             new MavenArtifact(
                 new MavenGroup(group), artifact
-            ), version, System.currentTimeMillis()
+            ), version, MvnPackagingType.JAR, System.currentTimeMillis()
         );
         Assertions.assertEquals(first, second);
         Assertions.assertEquals(
@@ -83,8 +93,27 @@ public final class MavenArtifactVersionTest {
                 new MavenArtifact(
                     new MavenGroup(group),
                     artifact
-                ), version, System.currentTimeMillis()
+                ), version, MvnPackagingType.JAR, System.currentTimeMillis()
             ).toString()
         );
+    }
+
+    /**
+     * Check that we properly assign and return the packaging of the artifact.
+     */
+    @Test
+    void testPackaging() throws Exception {
+        final List<MvnArtifactVersion> versions =
+            new MavenCentral().findVersions(
+                new MavenArtifact(
+                    new MavenGroup("org.apache.maven.plugins"),
+                    "maven-plugin-plugin"
+                )
+            );
+        for (final MvnArtifactVersion version : versions) {
+            Assertions.assertEquals(
+                MvnPackagingType.MAVEN_PLUGIN, version.packaging()
+            );
+        }
     }
 }

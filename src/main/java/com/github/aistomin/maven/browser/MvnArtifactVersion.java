@@ -57,4 +57,11 @@ public interface MvnArtifactVersion {
      * @return The dependency.
      */
     MvnDependency dependency();
+
+    /**
+     * Artifact's packaging.
+     *
+     * @return Packaging type.
+     */
+    MvnPackagingType packaging();
 }

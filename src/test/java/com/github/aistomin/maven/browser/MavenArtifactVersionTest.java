@@ -15,11 +15,15 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import org.apache.commons.io.FileUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,10 +35,17 @@ import org.junit.jupiter.api.Test;
 public final class MavenArtifactVersionTest {
 
     /**
+     * Expected test timestamp.
+     */
+    private static final Long TIMESTAMP = 1_479_480_474_000L;
+
+    /**
      * Check that we assign and return the encapsulated fields properly.
+     *
+     * @throws Exception If something goes wrong.
      */
     @Test
-    void testConstruct() {
+    void testConstruct() throws Exception {
         final MvnArtifact artifact = new MavenArtifact(
             new MavenGroup(UUID.randomUUID().toString()),
             UUID.randomUUID().toString()
@@ -53,6 +64,23 @@ public final class MavenArtifactVersionTest {
         Assertions.assertEquals(name, modern.name());
         Assertions.assertEquals(artifact, modern.artifact());
         Assertions.assertEquals(type, modern.packaging());
+        final MavenArtifactVersion json = new MavenArtifactVersion(
+            (JSONObject) new JSONParser().parse(
+                FileUtils.readFileToString(
+                    new File(
+                        Thread.currentThread().getContextClassLoader()
+                            .getResource("sample.json").getFile()
+                    ), "UTF-8"
+                )
+            )
+        );
+        Assertions.assertEquals("0.2.1", json.name());
+        Assertions.assertEquals(
+            MavenArtifactVersionTest.TIMESTAMP, json.releaseTimestamp()
+        );
+        Assertions.assertEquals(
+            MvnPackagingType.MAVEN_PLUGIN, json.packaging()
+        );
     }
 
     /**

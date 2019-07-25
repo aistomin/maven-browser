@@ -3,7 +3,7 @@
   "g": "com.github.aistomin",
   "a": "jenkins-sdk",
   "v": "0.2.1",
-  "p": "jar",
+  "p": "maven-plugin",
   "timestamp": 1479480474000,
   "ec": [
     "-javadoc.jar",

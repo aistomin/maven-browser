@@ -15,9 +15,13 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
+import org.apache.commons.io.FileUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,14 +34,29 @@ public final class MavenArtifactTest {
 
     /**
      * Check that we assign and return the encapsulated fields properly.
+     *
+     * @throws Exception If something goes wrong.
      */
     @Test
-    void testConstruct() {
+    void testConstruct() throws Exception {
         final String name = UUID.randomUUID().toString();
         final MvnGroup group = new MavenGroup(UUID.randomUUID().toString());
         final MvnArtifact artifact = new MavenArtifact(group, name);
         Assertions.assertEquals(name, artifact.name());
         Assertions.assertEquals(group, artifact.group());
+        Assertions.assertEquals(
+            "jenkins-sdk",
+            new MavenArtifact(
+                (JSONObject) new JSONParser().parse(
+                    FileUtils.readFileToString(
+                        new File(
+                            Thread.currentThread().getContextClassLoader()
+                                .getResource("sample.json").getFile()
+                        ), "UTF-8"
+                    )
+                )
+            ).name()
+        );
     }
 
     /**

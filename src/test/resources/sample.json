@@ -1,0 +1,20 @@
+{
+  "id": "com.github.aistomin:jenkins-sdk:0.2.1",
+  "g": "com.github.aistomin",
+  "a": "jenkins-sdk",
+  "v": "0.2.1",
+  "p": "jar",
+  "timestamp": 1479480474000,
+  "ec": [
+    "-javadoc.jar",
+    "-sources.jar",
+    ".jar",
+    ".pom"
+  ],
+  "tags": [
+    "wrapper",
+    "jenkins",
+    "written",
+    "java"
+  ]
+}

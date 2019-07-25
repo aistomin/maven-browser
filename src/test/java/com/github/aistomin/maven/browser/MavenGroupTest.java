@@ -15,9 +15,13 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
+import org.apache.commons.io.FileUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +31,26 @@ import org.junit.jupiter.api.Test;
  * @since 0.1
  */
 public final class MavenGroupTest {
+
+    /**
+     * Check that constructor is working properly.
+     *
+     * @throws Exception If something goes wrong.
+     */
+    @Test
+    void testConstruct() throws Exception {
+        final MvnGroup group = new MavenGroup(
+            (JSONObject) new JSONParser().parse(
+                FileUtils.readFileToString(
+                    new File(
+                        Thread.currentThread().getContextClassLoader()
+                            .getResource("sample.json").getFile()
+                    ), "UTF-8"
+                )
+            )
+        );
+        Assertions.assertEquals("com.github.aistomin", group.name());
+    }
 
     /**
      * Check that we correctly assign and return the name of the group.

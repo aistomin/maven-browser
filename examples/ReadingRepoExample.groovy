@@ -1,5 +1,8 @@
 import com.github.aistomin.maven.browser.MavenCentral
 
+/**
+ * In this example the basic reporitory browsing functions are demonstrated.
+ */
 @Grapes(
     @Grab(
         group = 'com.github.aistomin',

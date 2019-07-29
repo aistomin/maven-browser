@@ -4,7 +4,7 @@ import com.github.aistomin.maven.browser.MavenCentral
     @Grab(
         group = 'com.github.aistomin',
         module = 'maven-browser',
-        version = '0.1'
+        version = '1.0'
     )
 )
 
@@ -19,7 +19,7 @@ println ('The following artifact were found:')
 artifacts.each { artifact ->
     println(artifact.identifier())
 }
-final artifact = artifacts.get(0)
+final artifact = artifacts.find { it.name() == 'jenkins-sdk' }
 println(
     "Artifact ${artifact.identifier()} has the following versions:"
 )

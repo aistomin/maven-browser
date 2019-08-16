@@ -15,6 +15,8 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.Arrays;
+
 /**
  * The interface of classes which represent the Maven artifacts' group.
  *
@@ -83,5 +85,17 @@ public enum MvnPackagingType {
      */
     public String packaging() {
         return this.type;
+    }
+
+    /**
+     * Find the {@link MvnPackagingType} by it's string representation.
+     *
+     * @param str String representation of the packaging type.
+     * @return The corresponding enum instance.
+     */
+    @SuppressWarnings("PMD.ProhibitPublicStaticMethods")
+    public static MvnPackagingType find(final String str) {
+        return Arrays.stream(values()).filter(type -> type.type.equals(str))
+            .findFirst().orElse(null);
     }
 }

@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 1.0
  */
-public final class MavenDependencyTest {
+final class MavenDependencyTest {
 
     /**
      * My previously created artifact which we can use for tests.

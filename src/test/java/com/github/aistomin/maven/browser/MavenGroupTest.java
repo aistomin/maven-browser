@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1
  */
-public final class MavenGroupTest {
+final class MavenGroupTest {
 
     /**
      * Check that constructor is working properly.

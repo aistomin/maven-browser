@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1
  */
-public final class MavenArtifactVersionTest {
+final class MavenArtifactVersionTest {
 
     /**
      * Expected test timestamp.

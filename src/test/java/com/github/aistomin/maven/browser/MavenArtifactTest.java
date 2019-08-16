@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1
  */
-public final class MavenArtifactTest {
+final class MavenArtifactTest {
 
     /**
      * Check that we assign and return the encapsulated fields properly.

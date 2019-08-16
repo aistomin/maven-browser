@@ -25,17 +25,17 @@ import org.junit.jupiter.api.Test;
  *
  * @since 0.1
  */
-public final class MavenCentralTest {
+final class MavenCentralTest {
 
     /**
      * Five.
      */
-    public static final int FIVE = 5;
+    private static final int FIVE = 5;
 
     /**
      * Three.
      */
-    public static final int THREE = 3;
+    private static final int THREE = 3;
 
     /**
      * My previously created artifact which we can use for tests.

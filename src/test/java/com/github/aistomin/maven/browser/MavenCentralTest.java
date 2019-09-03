@@ -103,6 +103,22 @@ final class MavenCentralTest {
     }
 
     /**
+     * Check that we correctly throw exceptions if something went wrong.
+     */
+    @Test
+    void testExceptions() {
+        final MvnRepo repo = new MavenCentral("http://not.existing.mvn/");
+        Assertions.assertThrows(
+            MvnException.class,
+            () -> repo.findArtifacts("someartifact")
+        );
+        Assertions.assertThrows(
+            MvnException.class,
+            () -> repo.findVersions(this.mine)
+        );
+    }
+
+    /**
      * Check that we correctly find the versions of the artifact.
      *
      * @throws Exception If something went wrong.

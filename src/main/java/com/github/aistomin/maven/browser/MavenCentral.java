@@ -15,6 +15,7 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,63 +67,71 @@ public final class MavenCentral implements MvnRepo {
     }
 
     @Override
-    public List<MvnArtifact> findArtifacts(final String str) throws Exception {
+    public List<MvnArtifact> findArtifacts(final String str) throws MvnException {
         return this.findArtifacts(str, 0, MavenCentral.MAX_ROWS);
     }
 
     @Override
     public List<MvnArtifact> findArtifacts(
         final String str, final Integer start, final Integer rows
-    ) throws Exception {
-        final String result = IOUtils.toString(
-            URI.create(
-                String.format(
-                    "%s?q=%s&start=%d&rows=%d&wt=json",
-                    this.repo, str, start, rows
-                )
-            ),
-            MavenCentral.ENCODING
-        );
-        return new ArrayList<JSONObject>(MavenCentral.parseResponse(result))
-            .stream()
-            .map(MavenArtifact::new)
-            .collect(Collectors.toList());
+    ) throws MvnException {
+        try {
+            final String result = IOUtils.toString(
+                URI.create(
+                    String.format(
+                        "%s?q=%s&start=%d&rows=%d&wt=json",
+                        this.repo, str, start, rows
+                    )
+                ),
+                MavenCentral.ENCODING
+            );
+            return new ArrayList<JSONObject>(MavenCentral.parseResponse(result))
+                .stream()
+                .map(MavenArtifact::new)
+                .collect(Collectors.toList());
+        } catch (final ParseException | IOException exception) {
+            throw new MvnException(exception);
+        }
     }
 
     @Override
     public List<MvnArtifactVersion> findVersions(
         final MvnArtifact artifact
-    ) throws Exception {
+    ) throws MvnException {
         return this.findVersions(artifact, 0, MavenCentral.MAX_ROWS);
     }
 
     @Override
     public List<MvnArtifactVersion> findVersions(
         final MvnArtifact artifact, final Integer start, final Integer rows
-    ) throws Exception {
-        final String res = IOUtils.toString(
-            URI.create(
-                String.format(
-                    "%s?q=g:%s+AND+a:%s&core=gav&start=%d&rows=%d&wt=json",
-                    this.repo,
-                    artifact.group().name(),
-                    artifact.name(),
-                    start,
-                    rows
-                )
-            ),
-            MavenCentral.ENCODING
-        );
-        return new ArrayList<JSONObject>(MavenCentral.parseResponse(res))
-            .stream()
-            .map(MavenArtifactVersion::new)
-            .collect(Collectors.toList());
+    ) throws MvnException {
+        try {
+            final String res = IOUtils.toString(
+                URI.create(
+                    String.format(
+                        "%s?q=g:%s+AND+a:%s&core=gav&start=%d&rows=%d&wt=json",
+                        this.repo,
+                        artifact.group().name(),
+                        artifact.name(),
+                        start,
+                        rows
+                    )
+                ),
+                MavenCentral.ENCODING
+            );
+            return new ArrayList<JSONObject>(MavenCentral.parseResponse(res))
+                .stream()
+                .map(MavenArtifactVersion::new)
+                .collect(Collectors.toList());
+        } catch (final ParseException | IOException exception) {
+            throw new MvnException(exception);
+        }
     }
 
     @Override
     public List<MvnArtifactVersion> findVersionsNewerThan(
         final MvnArtifactVersion version
-    ) throws Exception {
+    ) throws MvnException {
         return this.findArtifactVersionsWithFilter(
             version.artifact(),
             ver -> ver.releaseTimestamp() > version.releaseTimestamp()
@@ -132,7 +141,7 @@ public final class MavenCentral implements MvnRepo {
     @Override
     public List<MvnArtifactVersion> findVersionsOlderThan(
         final MvnArtifactVersion version
-    ) throws Exception {
+    ) throws MvnException {
         return this.findArtifactVersionsWithFilter(
             version.artifact(),
             ver -> ver.releaseTimestamp() < version.releaseTimestamp()
@@ -145,12 +154,12 @@ public final class MavenCentral implements MvnRepo {
      * @param artifact The artifact.
      * @param predicate The filter.
      * @return The list of the found versions.
-     * @throws Exception If the problem occurred while reading from the repo.
+     * @throws MvnException If the problem occurred while reading from the repo.
      */
     private List<MvnArtifactVersion> findArtifactVersionsWithFilter(
         final MvnArtifact artifact,
         final Predicate<MvnArtifactVersion> predicate
-    ) throws Exception {
+    ) throws MvnException {
         return this.findVersions(artifact, 0, Integer.MAX_VALUE)
             .stream()
             .filter(predicate)

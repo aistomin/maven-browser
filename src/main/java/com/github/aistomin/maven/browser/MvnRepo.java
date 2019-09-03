@@ -29,9 +29,9 @@ public interface MvnRepo {
      *
      * @param str The search string. It may be a part of group or artifact name.
      * @return The list of the found artifacts.
-     * @throws Exception If the problem occurred while reading from the repo.
+     * @throws MvnException If the problem occurred while reading from the repo.
      */
-    List<MvnArtifact> findArtifacts(String str) throws Exception;
+    List<MvnArtifact> findArtifacts(String str) throws MvnException;
 
     /**
      * Search for the artifacts.
@@ -40,20 +40,20 @@ public interface MvnRepo {
      * @param start The start index of the search.
      * @param rows The max amount of results.
      * @return The list of the found artifacts.
-     * @throws Exception If the problem occurred while reading from the repo.
+     * @throws MvnException If the problem occurred while reading from the repo.
      */
     List<MvnArtifact> findArtifacts(
         String str, Integer start, Integer rows
-    ) throws Exception;
+    ) throws MvnException;
 
     /**
      * Search for the versions of the artifact. Returns first 20 found versions.
      *
      * @param artifact The artifact.
      * @return The list of the found versions of the artifact.
-     * @throws Exception If the problem occurred while reading from the repo.
+     * @throws MvnException If the problem occurred while reading from the repo.
      */
-    List<MvnArtifactVersion> findVersions(MvnArtifact artifact) throws Exception;
+    List<MvnArtifactVersion> findVersions(MvnArtifact artifact) throws MvnException;
 
     /**
      * Search for the versions of the artifact.
@@ -62,11 +62,11 @@ public interface MvnRepo {
      * @param start Indent of the search.
      * @param rows The max amount of results.
      * @return The list of the found versions of the artifact.
-     * @throws Exception If the problem occurred while reading from the repo.
+     * @throws MvnException If the problem occurred while reading from the repo.
      */
     List<MvnArtifactVersion> findVersions(
         MvnArtifact artifact, Integer start, Integer rows
-    ) throws Exception;
+    ) throws MvnException;
 
     /**
      * Search for all the versions of the artifact which are newer than provided
@@ -74,11 +74,11 @@ public interface MvnRepo {
      *
      * @param version The version.
      * @return The list of the newer versions.
-     * @throws Exception If the problem occurred while reading from the repo.
+     * @throws MvnException If the problem occurred while reading from the repo.
      */
     List<MvnArtifactVersion> findVersionsNewerThan(
         MvnArtifactVersion version
-    ) throws Exception;
+    ) throws MvnException;
 
     /**
      * Search for all the versions of the artifact which are older than provided
@@ -86,9 +86,9 @@ public interface MvnRepo {
      *
      * @param version The version.
      * @return The list of the older versions.
-     * @throws Exception If the problem occurred while reading from the repo.
+     * @throws MvnException If the problem occurred while reading from the repo.
      */
     List<MvnArtifactVersion> findVersionsOlderThan(
         MvnArtifactVersion version
-    ) throws Exception;
+    ) throws MvnException;
 }

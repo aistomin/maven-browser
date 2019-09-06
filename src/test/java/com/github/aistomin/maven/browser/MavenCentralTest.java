@@ -155,6 +155,19 @@ final class MavenCentralTest {
     @Test
     void testFindVersionsNewerThan() throws Exception {
         final MvnRepo mvn = new MavenCentral();
+        Assertions.assertThrows(
+            IllegalStateException.class,
+            () -> {
+                mvn.findVersionsNewerThan(
+                    new MavenArtifactVersion(
+                        this.mine,
+                        "not-existing",
+                        MvnPackagingType.JAR,
+                        System.currentTimeMillis()
+                    )
+                );
+            }
+        );
         final MvnArtifactVersion version = mvn.findVersions(this.mine)
             .stream()
             .filter(
@@ -178,6 +191,19 @@ final class MavenCentralTest {
     @Test
     void testFindVersionsOlderThan() throws Exception {
         final MvnRepo mvn = new MavenCentral();
+        Assertions.assertThrows(
+            IllegalStateException.class,
+            () -> {
+                mvn.findVersionsNewerThan(
+                    new MavenArtifactVersion(
+                        this.mine,
+                        "wrong-version",
+                        MvnPackagingType.JAR,
+                        System.currentTimeMillis()
+                    )
+                );
+            }
+        );
         final MvnArtifactVersion version = mvn.findVersions(this.mine)
             .stream()
             .filter(

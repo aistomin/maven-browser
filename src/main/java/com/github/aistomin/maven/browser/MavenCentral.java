@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
@@ -133,8 +133,9 @@ public final class MavenCentral implements MvnRepo {
         final MvnArtifactVersion version
     ) throws MvnException {
         return this.findArtifactVersionsWithFilter(
-            version.artifact(),
-            ver -> ver.releaseTimestamp() > version.releaseTimestamp()
+            version,
+            (ver, current) ->
+                ver.releaseTimestamp() > current.releaseTimestamp()
         );
     }
 
@@ -143,26 +144,42 @@ public final class MavenCentral implements MvnRepo {
         final MvnArtifactVersion version
     ) throws MvnException {
         return this.findArtifactVersionsWithFilter(
-            version.artifact(),
-            ver -> ver.releaseTimestamp() < version.releaseTimestamp()
+            version,
+            (ver, current) ->
+                ver.releaseTimestamp() < current.releaseTimestamp()
         );
     }
 
     /**
      * Find all the versions of the artifact with filter.
      *
-     * @param artifact The artifact.
+     * @param current Current version.
      * @param predicate The filter.
      * @return The list of the found versions.
      * @throws MvnException If the problem occurred while reading from the repo.
      */
     private List<MvnArtifactVersion> findArtifactVersionsWithFilter(
-        final MvnArtifact artifact,
-        final Predicate<MvnArtifactVersion> predicate
+        final MvnArtifactVersion current,
+        final BiPredicate<MvnArtifactVersion, MvnArtifactVersion> predicate
     ) throws MvnException {
-        return this.findVersions(artifact, 0, Integer.MAX_VALUE)
+        final List<MvnArtifactVersion> versions =
+            this.findVersions(current.artifact(), 0, Integer.MAX_VALUE);
+        final MvnArtifactVersion loaded = versions
             .stream()
-            .filter(predicate)
+            .filter(ver -> ver.name().equals(current.name()))
+            .findFirst()
+            .orElse(null);
+        if (loaded == null) {
+            throw new IllegalStateException(
+                String.format(
+                    "Version %s was not found in Maven Central.",
+                    current.name()
+                )
+            );
+        }
+        return versions
+            .stream()
+            .filter(ver -> predicate.test(ver, loaded))
             .collect(Collectors.toList());
     }
 

@@ -93,7 +93,7 @@ final class MavenCentralTest {
                 )
         );
         final List<MvnArtifact> found = mvn.findArtifacts("aistomin");
-        Assertions.assertEquals(2, found.size());
+        Assertions.assertEquals(MavenCentralTest.THREE, found.size());
         Assertions.assertNotNull(
             found.stream()
                 .filter(artifact -> artifact.equals(this.mine))

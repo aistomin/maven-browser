@@ -1,8 +1,8 @@
 # maven-browser
 [![Build Status](https://travis-ci.org/aistomin/maven-browser.svg?branch=master)](https://travis-ci.org/aistomin/maven-browser)
 [![codecov](https://codecov.io/gh/aistomin/maven-browser/branch/master/graph/badge.svg)](https://codecov.io/gh/aistomin/maven-browser)
-[![javadoc](https://javadoc.io/badge2/com.github.aistomin/maven-browser/javadoc.svg)](https://javadoc.io/doc/com.github.aistomin/maven-browser)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.aistomin/maven-browser/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.aistomin/maven-browser)
+[![javadoc](https://javadoc.io/badge2/com.github.aistomin/maven-browser/javadoc.svg)](https://javadoc.io/doc/com.github.aistomin/maven-browser)
 
 This Java library allows to browse the Maven Central repository. It uses 
 [Maven Central API](https://search.maven.org/classic/#api) to retrieve the data from the

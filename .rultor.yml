@@ -7,4 +7,4 @@ merge:
   script: |-
     java -version
     mvn -version
-    mvn clean install package
+    mvn clean install package javadoc:javadoc

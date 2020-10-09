@@ -59,5 +59,3 @@ request please run full Maven build:
 $ mvn clean install package javadoc:javadoc
 ```
 Keep in mind our [system requirements](#system-requirements).
-
-                              

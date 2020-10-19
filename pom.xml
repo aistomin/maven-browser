@@ -40,7 +40,7 @@
         </repository>
     </distributionManagement>
     <properties>
-        <junitVersion>5.3.1</junitVersion>
+        <junitVersion>5.7.0</junitVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>

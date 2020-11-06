@@ -7,7 +7,7 @@ import com.github.aistomin.maven.browser.MavenCentral
     @Grab(
         group = 'com.github.aistomin',
         module = 'maven-browser',
-        version = '1.3'
+        version = '1.4'
     )
 )
 

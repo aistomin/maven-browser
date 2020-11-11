@@ -17,6 +17,7 @@ package com.github.aistomin.maven.browser;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -41,6 +42,11 @@ final class MavenCentralTest {
      * Five.
      */
     private static final int FIVE = 5;
+
+    /**
+     * Ten.
+     */
+    private static final int TEN = 10;
 
     /**
      * My previously created artifact which we can use for tests.
@@ -224,5 +230,56 @@ final class MavenCentralTest {
         Assertions.assertEquals(
             this.vers.get(this.vers.size() - 1), older.get(1).name()
         );
+    }
+
+    /**
+     * Check that we correctly find the versions which are newer than provided
+     * one.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testCompareVersionsByNumber() throws Exception {
+        final MvnRepo mvn = new MavenCentral();
+        final MavenArtifactVersion current = new MavenArtifactVersion(
+            new MavenArtifact(
+                new MavenGroup("org.junit.jupiter"),
+                "junit-jupiter-api"
+            ),
+            "5.7.0",
+            MvnPackagingType.JAR,
+            System.currentTimeMillis()
+        );
+        final List<MvnArtifactVersion> newer =
+            mvn.findVersionsNewerThan(current);
+        for (final MvnArtifactVersion version : newer) {
+            Assertions.assertTrue(
+                this.calculateNumberFromVersion(version.name())
+                    > this.calculateNumberFromVersion(current.name()),
+                String.format(
+                    "Version %s is not newer than %s.",
+                    version.name(), current.name()
+                )
+            );
+        }
+    }
+
+    /**
+     * Calculate a numeric representation of the version.
+     *
+     * @param version The version.
+     * @return The numeric representation.
+     */
+    private Double calculateNumberFromVersion(final String version) {
+        final String clean = version.replaceAll("[^\\d.]", "");
+        final List<String> nums = Arrays.asList(clean.split("\\."));
+        return IntStream
+            .range(0, nums.size())
+            .mapToDouble(
+                index ->
+                Integer.parseInt(nums.get(index))
+                    * Math.pow(MavenCentralTest.TEN, nums.size() - index - 1)
+            )
+            .sum();
     }
 }

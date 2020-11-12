@@ -18,9 +18,13 @@ package com.github.aistomin.maven.browser;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.OptionalInt;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -134,8 +138,7 @@ public final class MavenCentral implements MvnRepo {
     ) throws MvnException {
         return this.findArtifactVersionsWithFilter(
             version,
-            (ver, current) ->
-                ver.releaseTimestamp() > current.releaseTimestamp()
+            MavenCentral::isFirstVersionBiggerThanSecondVersion
         );
     }
 
@@ -146,7 +149,7 @@ public final class MavenCentral implements MvnRepo {
         return this.findArtifactVersionsWithFilter(
             version,
             (ver, current) ->
-                ver.releaseTimestamp() < current.releaseTimestamp()
+                MavenCentral.isFirstVersionBiggerThanSecondVersion(current, ver)
         );
     }
 
@@ -197,5 +200,35 @@ public final class MavenCentral implements MvnRepo {
             (JSONObject) ((JSONObject) new JSONParser().parse(response))
                 .get("response")
         ).get("docs");
+    }
+
+    /**
+     * Check if one version is bigger than another.
+     *
+     * @param first Version A.
+     * @param second Version B.
+     * @return True - version A is bigger than version B. False - version A is
+     *  smaller or equal to version B.
+     */
+    private static Boolean isFirstVersionBiggerThanSecondVersion(
+        final MvnArtifactVersion first,
+        final MvnArtifactVersion second
+    ) {
+        final String pattern = "\\.";
+        final List<String> one =
+            Arrays.asList(first.name().split(pattern));
+        final List<String> two =
+            Arrays.asList(second.name().split(pattern));
+        final OptionalInt difference = IntStream.range(0, one.size()).filter(
+            idx -> idx <= (two.size() - 1) && !one.get(idx).equals(two.get(idx))
+        ).findFirst();
+        final AtomicBoolean result = new AtomicBoolean();
+        if (difference.isPresent()) {
+            final int idx = difference.getAsInt();
+            result.set(one.get(idx).compareTo(two.get(idx)) > 0);
+        } else {
+            result.set(one.size() > two.size());
+        }
+        return result.get();
     }
 }

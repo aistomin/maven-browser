@@ -55,22 +55,6 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
      *
      * @param artifact Maven artifact.
      * @param version Maven artifact version.
-     * @param timestamp The timestamp when the version was released.
-     * @deprecated Use the constructor with "packaging" parameter instead.
-     */
-    @Deprecated
-    public MavenArtifactVersion(
-        final MvnArtifact artifact, final String version,
-        final Long timestamp
-    ) {
-        this(artifact, version, MvnPackagingType.JAR, timestamp);
-    }
-
-    /**
-     * Ctor.
-     *
-     * @param artifact Maven artifact.
-     * @param version Maven artifact version.
      * @param packaging Maven packaging type.
      * @param timestamp The timestamp when the version was released.
      * @checkstyle ParameterNumberCheck (10 lines)

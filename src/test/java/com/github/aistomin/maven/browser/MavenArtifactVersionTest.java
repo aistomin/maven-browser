@@ -51,11 +51,6 @@ final class MavenArtifactVersionTest {
             UUID.randomUUID().toString()
         );
         final String name = UUID.randomUUID().toString();
-        final MvnArtifactVersion old = new MavenArtifactVersion(
-            artifact, name, System.currentTimeMillis()
-        );
-        Assertions.assertEquals(name, old.name());
-        Assertions.assertEquals(artifact, old.artifact());
         final MvnPackagingType[] types = MvnPackagingType.values();
         final MvnPackagingType type = types[new Random().nextInt(types.length)];
         final MvnArtifactVersion modern = new MavenArtifactVersion(

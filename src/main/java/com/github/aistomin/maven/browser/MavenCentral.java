@@ -89,7 +89,7 @@ public final class MavenCentral implements MvnRepo {
                 ),
                 MavenCentral.ENCODING
             );
-            return new ArrayList<JSONObject>(MavenCentral.parseResponse(result))
+            return MavenCentral.parseResponse(result)
                 .stream()
                 .map(MavenArtifact::new)
                 .collect(Collectors.toList());
@@ -123,7 +123,7 @@ public final class MavenCentral implements MvnRepo {
                 ),
                 MavenCentral.ENCODING
             );
-            return new ArrayList<JSONObject>(MavenCentral.parseResponse(res))
+            return MavenCentral.parseResponse(res)
                 .stream()
                 .map(MavenArtifactVersion::new)
                 .collect(Collectors.toList());
@@ -193,13 +193,16 @@ public final class MavenCentral implements MvnRepo {
      * @return The list of JSON objects.
      * @throws ParseException If parsing wasn't successful.
      */
-    private static JSONArray parseResponse(
+    @SuppressWarnings("unchecked")
+    private static List<JSONObject> parseResponse(
         final String response
     ) throws ParseException {
-        return (JSONArray) (
-            (JSONObject) ((JSONObject) new JSONParser().parse(response))
-                .get("response")
-        ).get("docs");
+        return new ArrayList<JSONObject>(
+            (JSONArray) (
+                (JSONObject) ((JSONObject) new JSONParser().parse(response))
+                    .get("response")
+            ).get("docs")
+        );
     }
 
     /**

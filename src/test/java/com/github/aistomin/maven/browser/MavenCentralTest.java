@@ -34,11 +34,6 @@ final class MavenCentralTest {
     private static final int THREE = 3;
 
     /**
-     * Four.
-     */
-    private static final int FOUR = 4;
-
-    /**
      * Five.
      */
     private static final int FIVE = 5;
@@ -104,7 +99,7 @@ final class MavenCentralTest {
                 )
         );
         final List<MvnArtifact> found = mvn.findArtifacts("aistomin");
-        Assertions.assertEquals(MavenCentralTest.FOUR, found.size());
+        Assertions.assertEquals(MavenCentralTest.FIVE, found.size());
         Assertions.assertNotNull(
             found.stream()
                 .filter(artifact -> artifact.equals(this.mine))

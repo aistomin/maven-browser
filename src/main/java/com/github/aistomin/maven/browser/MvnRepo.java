@@ -53,7 +53,9 @@ public interface MvnRepo {
      * @return The list of the found versions of the artifact.
      * @throws MvnException If the problem occurred while reading from the repo.
      */
-    List<MvnArtifactVersion> findVersions(MvnArtifact artifact) throws MvnException;
+    List<MvnArtifactVersion> findVersions(
+        MvnArtifact artifact
+    ) throws MvnException;
 
     /**
      * Search for the versions of the artifact.

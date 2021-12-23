@@ -71,7 +71,9 @@ public final class MavenCentral implements MvnRepo {
     }
 
     @Override
-    public List<MvnArtifact> findArtifacts(final String str) throws MvnException {
+    public List<MvnArtifact> findArtifacts(
+        final String str
+    ) throws MvnException {
         return this.findArtifacts(str, 0, MavenCentral.MAX_ROWS);
     }
 

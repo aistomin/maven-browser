@@ -119,6 +119,11 @@
                                     <name>checkstyle</name>
                                     <placement>X</placement>
                                 </tag>
+                                <tag>
+                                    <name>todo</name>
+                                    <placement>a</placement>
+                                    <head>TODOs:</head>
+                                </tag>
                             </tags>
                         </configuration>
                         <executions>
@@ -261,7 +266,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>1.00</minimum>
+                                            <minimum>0.9</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -296,6 +301,11 @@
                         <tag>
                             <name>checkstyle</name>
                             <placement>X</placement>
+                        </tag>
+                        <tag>
+                            <name>todo</name>
+                            <placement>a</placement>
+                            <head>TODOs:</head>
                         </tag>
                     </tags>
                 </configuration>

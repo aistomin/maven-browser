@@ -36,7 +36,7 @@ final class VersionComparatorTest {
             "fake"
         );
         Assertions.assertInstanceOf(
-            OldStyleVersionComparator.class,
+            DefaultVersionComparator.class,
             VersionComparator.comparator(
                 new MavenArtifactVersion(
                     fake, "2.17.1",
@@ -44,6 +44,45 @@ final class VersionComparatorTest {
                 ),
                 new MavenArtifactVersion(
                     fake, "2.3.2",
+                    MvnPackagingType.JAR, System.currentTimeMillis()
+                )
+            )
+        );
+        Assertions.assertInstanceOf(
+            DefaultVersionComparator.class,
+            VersionComparator.comparator(
+                new MavenArtifactVersion(
+                    fake, "1.0",
+                    MvnPackagingType.JAR, System.currentTimeMillis()
+                ),
+                new MavenArtifactVersion(
+                    fake, "1.1",
+                    MvnPackagingType.JAR, System.currentTimeMillis()
+                )
+            )
+        );
+        Assertions.assertInstanceOf(
+            DefaultVersionComparator.class,
+            VersionComparator.comparator(
+                new MavenArtifactVersion(
+                    fake, "1",
+                    MvnPackagingType.JAR, System.currentTimeMillis()
+                ),
+                new MavenArtifactVersion(
+                    fake, "1.1",
+                    MvnPackagingType.JAR, System.currentTimeMillis()
+                )
+            )
+        );
+        Assertions.assertInstanceOf(
+            DefaultVersionComparator.class,
+            VersionComparator.comparator(
+                new MavenArtifactVersion(
+                    fake, "1",
+                    MvnPackagingType.JAR, System.currentTimeMillis()
+                ),
+                new MavenArtifactVersion(
+                    fake, "2",
                     MvnPackagingType.JAR, System.currentTimeMillis()
                 )
             )

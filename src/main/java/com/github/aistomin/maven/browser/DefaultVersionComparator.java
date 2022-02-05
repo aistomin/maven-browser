@@ -67,7 +67,7 @@ public final class DefaultVersionComparator implements VersionComparator {
             .map(Long::valueOf)
             .collect(Collectors.toList());
         for (int index = 0; index < Math.min(one.size(), two.size()); index++) {
-            if (one.get(index) != two.get(index)) {
+            if (one.get(index).longValue() != two.get(index).longValue()) {
                 return one.get(index) > two.get(index);
             }
         }

@@ -1,6 +1,10 @@
 version: 1.0.{build}
 skip_tags: true
+branches:
+  only:
+    - master
 image: Ubuntu2004
 build: off
 test_script:
-  - ./build.sh
+  - mvn clean install package javadoc:javadoc
+  - bash <(curl -s https://codecov.io/bash)

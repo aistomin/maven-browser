@@ -4,7 +4,7 @@ branches:
   only:
     - master
 image: Ubuntu2004
-build: off
-test_script:
+build_script:
+  - echo $JAVA_HOME
   - mvn clean install package javadoc:javadoc
   - bash <(curl -s https://codecov.io/bash)

@@ -17,16 +17,13 @@ package com.github.aistomin.maven.browser;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.OptionalInt;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.IntStream;
+import java.util.stream.Collectors;
 
 /**
  * The comparator that compares two standard numeric versions like 1.0.1
  * and 2.0.
  *
  * @since 2.0
- * @todo Implement #186 and remove this TODO.
  */
 public final class DefaultVersionComparator implements VersionComparator {
 
@@ -60,22 +57,21 @@ public final class DefaultVersionComparator implements VersionComparator {
                 "The comparator is not applicable to the provided versions."
             );
         }
-        final String pattern = "\\.";
-        final List<String> one =
-            Arrays.asList(this.first.name().split(pattern));
-        final List<String> two =
-            Arrays.asList(this.second.name().split(pattern));
-        final OptionalInt difference = IntStream.range(0, one.size()).filter(
-            idx -> idx <= (two.size() - 1) && !one.get(idx).equals(two.get(idx))
-        ).findFirst();
-        final AtomicBoolean result = new AtomicBoolean();
-        if (difference.isPresent()) {
-            final int idx = difference.getAsInt();
-            result.set(one.get(idx).compareTo(two.get(idx)) > 0);
-        } else {
-            result.set(one.size() > two.size());
+        final String dot = "\\.";
+        final List<Long> one = Arrays
+            .stream(this.first.name().split(dot))
+            .map(Long::valueOf)
+            .collect(Collectors.toList());
+        final List<Long> two = Arrays
+            .stream(this.second.name().split(dot))
+            .map(Long::valueOf)
+            .collect(Collectors.toList());
+        for (int index = 0; index < Math.min(one.size(), two.size()); index++) {
+            if (one.get(index).longValue() != two.get(index).longValue()) {
+                return one.get(index) > two.get(index);
+            }
         }
-        return result.get();
+        return false;
     }
 
     @Override

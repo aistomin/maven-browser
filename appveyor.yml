@@ -1,0 +1,6 @@
+version: 1.0.{build}
+image: Ubuntu2004
+build:
+  verbosity: minimal
+test_script:
+  - cmd: ./build.sh

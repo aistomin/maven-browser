@@ -57,7 +57,6 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
      * @param version Maven artifact version.
      * @param packaging Maven packaging type.
      * @param timestamp The timestamp when the version was released.
-     * @checkstyle ParameterNumberCheck (10 lines)
      */
     public MavenArtifactVersion(
         final MvnArtifact artifact, final String version,

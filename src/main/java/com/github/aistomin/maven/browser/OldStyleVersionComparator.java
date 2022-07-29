@@ -15,6 +15,7 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalInt;
@@ -56,18 +57,38 @@ public final class OldStyleVersionComparator implements VersionComparator {
     public Boolean isFirstBiggerThanSecond() {
         final String pattern = "\\.";
         final List<String> one =
-            Arrays.asList(this.first.name().split(pattern));
+            new ArrayList<>(Arrays.asList(this.first.name().split(pattern)));
         final List<String> two =
-            Arrays.asList(this.second.name().split(pattern));
+            new ArrayList<>(Arrays.asList(this.second.name().split(pattern)));
+        if (one.size() != two.size()) {
+            IntStream.range(0, Math.max(one.size(), two.size())).forEach(
+                index -> {
+                    final String zero = "0";
+                    if (one.size() == index) {
+                        one.add(index, zero);
+                    }
+                    if (two.size() == index) {
+                        two.add(index, zero);
+                    }
+                }
+            );
+        }
         final OptionalInt difference = IntStream.range(0, one.size()).filter(
             idx -> idx <= (two.size() - 1) && !one.get(idx).equals(two.get(idx))
         ).findFirst();
         final AtomicBoolean result = new AtomicBoolean();
         if (difference.isPresent()) {
             final int idx = difference.getAsInt();
-            result.set(one.get(idx).compareTo(two.get(idx)) > 0);
+            final String regex = "^\\d+(\\.\\d+)*$";
+            final String a = one.get(idx);
+            final String b = two.get(idx);
+            if (a.matches(regex) && b.matches(regex)) {
+                return Long.parseLong(a) > Long.parseLong(b);
+            } else {
+                result.set(a.compareTo(b) > 0);
+            }
         } else {
-            result.set(one.size() > two.size());
+            result.set(false);
         }
         return result.get();
     }

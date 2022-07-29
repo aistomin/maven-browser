@@ -15,11 +15,15 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * The comparator that compares two versions in the old style manner that we had
@@ -56,18 +60,38 @@ public final class OldStyleVersionComparator implements VersionComparator {
     public Boolean isFirstBiggerThanSecond() {
         final String pattern = "\\.";
         final List<String> one =
-            Arrays.asList(this.first.name().split(pattern));
+            new ArrayList<>(Arrays.asList(this.first.name().split(pattern)));
         final List<String> two =
-            Arrays.asList(this.second.name().split(pattern));
+            new ArrayList<>(Arrays.asList(this.second.name().split(pattern)));
+        if (one.size() != two.size()) {
+            final Optional<List<String>> smallest =
+                Stream.of(one, two).min(Comparator.comparing(List::size));
+            final Optional<List<String>> biggest =
+                Stream.of(one, two).max(Comparator.comparing(List::size));
+            IntStream.range(0, biggest.get().size()).forEach(
+                index -> {
+                    final int size = smallest.get().size();
+                    if (size == index) {
+                        smallest.get().add(index, "0");
+                    }
+                }
+            );
+        }
         final OptionalInt difference = IntStream.range(0, one.size()).filter(
             idx -> idx <= (two.size() - 1) && !one.get(idx).equals(two.get(idx))
         ).findFirst();
         final AtomicBoolean result = new AtomicBoolean();
         if (difference.isPresent()) {
             final int idx = difference.getAsInt();
-            result.set(one.get(idx).compareTo(two.get(idx)) > 0);
+            final String regex = "^\\d+(\\.\\d+)*$";
+            if (one.get(idx).matches(regex) && two.get(idx).matches(regex)) {
+                return Long.parseLong(one.get(idx))
+                    > Long.parseLong(two.get(idx));
+            } else {
+                result.set(one.get(idx).compareTo(two.get(idx)) > 0);
+            }
         } else {
-            result.set(one.size() > two.size());
+            result.set(false);
         }
         return result.get();
     }

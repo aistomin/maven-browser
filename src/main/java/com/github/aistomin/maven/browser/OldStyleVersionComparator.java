@@ -17,13 +17,10 @@ package com.github.aistomin.maven.browser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * The comparator that compares two versions in the old style manner that we had
@@ -64,15 +61,14 @@ public final class OldStyleVersionComparator implements VersionComparator {
         final List<String> two =
             new ArrayList<>(Arrays.asList(this.second.name().split(pattern)));
         if (one.size() != two.size()) {
-            final Optional<List<String>> smallest =
-                Stream.of(one, two).min(Comparator.comparing(List::size));
-            final Optional<List<String>> biggest =
-                Stream.of(one, two).max(Comparator.comparing(List::size));
-            IntStream.range(0, biggest.get().size()).forEach(
+            IntStream.range(0, Math.max(one.size(), two.size())).forEach(
                 index -> {
-                    final int size = smallest.get().size();
-                    if (size == index) {
-                        smallest.get().add(index, "0");
+                    final String zero = "0";
+                    if (one.size() == index) {
+                        one.add(index, zero);
+                    }
+                    if (two.size() == index) {
+                        two.add(index, zero);
                     }
                 }
             );
@@ -84,11 +80,12 @@ public final class OldStyleVersionComparator implements VersionComparator {
         if (difference.isPresent()) {
             final int idx = difference.getAsInt();
             final String regex = "^\\d+(\\.\\d+)*$";
-            if (one.get(idx).matches(regex) && two.get(idx).matches(regex)) {
-                return Long.parseLong(one.get(idx))
-                    > Long.parseLong(two.get(idx));
+            final String a = one.get(idx);
+            final String b = two.get(idx);
+            if (a.matches(regex) && b.matches(regex)) {
+                return Long.parseLong(a) > Long.parseLong(b);
             } else {
-                result.set(one.get(idx).compareTo(two.get(idx)) > 0);
+                result.set(a.compareTo(b) > 0);
             }
         } else {
             result.set(false);

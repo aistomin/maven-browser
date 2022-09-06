@@ -182,7 +182,6 @@
                 </dependencies>
                 <configuration>
                     <configLocation>conf/checkstyle.xml</configLocation>
-                    <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                     <linkXRef>false</linkXRef>
@@ -200,7 +199,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.18.0</version>
+                <version>3.19.0</version>
                 <configuration>
                     <failurePriority>1</failurePriority>
                     <failOnViolation>true</failOnViolation>

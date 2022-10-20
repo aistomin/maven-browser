@@ -6,7 +6,7 @@ branches:
 image: Ubuntu2004
 environment:
   matrix:
-    - JAVA_HOME: /usr/lib/jvm/java-15-openjdk-amd64
+    - JAVA_HOME: /usr/lib/jvm/java-18-openjdk-amd64
 build_script:
   - echo $JAVA_HOME
   - mvn clean install package javadoc:javadoc

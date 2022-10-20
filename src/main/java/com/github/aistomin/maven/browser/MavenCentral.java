@@ -16,6 +16,7 @@
 package com.github.aistomin.maven.browser;
 
 import java.io.IOException;
+import java.lang.module.ModuleDescriptor.Version;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -215,7 +216,7 @@ public final class MavenCentral implements MvnRepo {
         final MvnArtifactVersion first,
         final MvnArtifactVersion second
     ) {
-        return VersionComparator.comparator(first, second)
-            .isFirstBiggerThanSecond();
+        return Version.parse(first.name())
+            .compareTo(Version.parse(second.name())) > 0;
     }
 }

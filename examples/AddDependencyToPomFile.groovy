@@ -11,7 +11,7 @@ import com.github.aistomin.maven.browser.MavenCentral
         version = '2.3'
     )
 )
-final slurper = new XmlSlurper(false, false)
+final slurper = new groovy.xml.XmlSlurper(false, false)
 println('Parsing POM file .....')
 final pomRoot = slurper.parseText(new File('pom_sample.xml').text)
 println()

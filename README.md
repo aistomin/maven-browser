@@ -13,7 +13,7 @@ environmental software that needs to read information from Maven repository.
 ## Getting Started
 
 ### System Requirements
- - JDK 18 or higher.
+ - JDK 17 or higher.
  - Apache Maven 3.3.9 or higher
  
 ### Add Maven Dependency

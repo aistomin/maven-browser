@@ -1,5 +1,5 @@
 # maven-browser
-[![Build status](https://ci.appveyor.com/api/projects/status/25w1hsm2f7wwkoob/branch/master?svg=true)](https://ci.appveyor.com/project/aistomin/maven-browser/branch/master)
+[![CI](https://github.com/aistomin/maven-browser/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/aistomin/maven-browser/actions/workflows/maven.yml)
 [![Hits-of-Code](https://hitsofcode.com/github/aistomin/maven-browser)](https://hitsofcode.com/view/github/aistomin/maven-browser)
 [![codecov](https://codecov.io/gh/aistomin/maven-browser/branch/master/graph/badge.svg)](https://codecov.io/gh/aistomin/maven-browser)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.aistomin/maven-browser/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.aistomin/maven-browser)

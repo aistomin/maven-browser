@@ -274,23 +274,23 @@
                     </execution>
                 </executions>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>com.github.aistomin</groupId>-->
-<!--                <artifactId>maven-dependencies-analyser</artifactId>-->
-<!--                <version>2.3</version>-->
-<!--                <configuration>-->
-<!--                    <level>WARNING</level>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>default</id>-->
-<!--                        <phase>verify</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>check</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>com.github.aistomin</groupId>
+                <artifactId>maven-dependencies-analyser</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <level>WARNING</level>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>

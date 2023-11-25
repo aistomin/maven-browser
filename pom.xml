@@ -277,7 +277,7 @@
             <plugin>
                 <groupId>com.github.aistomin</groupId>
                 <artifactId>maven-dependencies-analyser</artifactId>
-                <version>2.4</version>
+                <version>3.0</version>
                 <configuration>
                     <level>WARNING</level>
                 </configuration>

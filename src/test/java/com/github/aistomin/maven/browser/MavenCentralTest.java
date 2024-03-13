@@ -234,7 +234,6 @@ final class MavenCentralTest {
      *
      * @throws Exception If something went wrong.
      */
-    @Disabled("See Issue #350.")
     @Test
     void testCompareVersionsByNumber() throws Exception {
         final MvnRepo mvn = new MavenCentral();
@@ -243,7 +242,7 @@ final class MavenCentralTest {
                 new MavenGroup("org.junit.jupiter"),
                 "junit-jupiter-api"
             ),
-            "5.7.0",
+            "5.10.1",
             MvnPackagingType.JAR,
             System.currentTimeMillis()
         );

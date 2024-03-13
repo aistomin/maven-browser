@@ -174,7 +174,8 @@ public final class MavenCentral implements MvnRepo {
         if (loaded == null) {
             throw new IllegalStateException(
                 String.format(
-                    "Version %s was not found in Maven Central.",
+                    "%s %s was not found in Maven Central.",
+                    current.artifact().name(),
                     current.name()
                 )
             );

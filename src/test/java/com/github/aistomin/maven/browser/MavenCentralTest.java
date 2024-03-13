@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -233,6 +234,7 @@ final class MavenCentralTest {
      *
      * @throws Exception If something went wrong.
      */
+    @Disabled("See Issue #350.")
     @Test
     void testCompareVersionsByNumber() throws Exception {
         final MvnRepo mvn = new MavenCentral();

@@ -41,7 +41,7 @@
     </distributionManagement>
     <properties>
         <junitVersion>5.11.0-M2</junitVersion>
-        <javadocPluginVersion>3.6.3</javadocPluginVersion>
+        <javadocPluginVersion>3.7.0</javadocPluginVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <linkXRef>false</linkXRef>

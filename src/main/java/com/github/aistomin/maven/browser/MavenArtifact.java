@@ -85,7 +85,7 @@ public final class MavenArtifact implements MvnArtifact {
 
     @Override
     public int hashCode() {
-        return MavenArtifact.MAGIC_NUMBER * this.artifact.hashCode()
+        return MAGIC_NUMBER * this.artifact.hashCode()
             + this.grp.hashCode();
     }
 

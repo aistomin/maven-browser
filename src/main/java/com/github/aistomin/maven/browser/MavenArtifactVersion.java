@@ -128,8 +128,7 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
 
     @Override
     public int hashCode() {
-        return MavenArtifactVersion.MAGIC_NUMBER * this.art.hashCode()
-            + this.ver.hashCode();
+        return MAGIC_NUMBER * this.art.hashCode() + this.ver.hashCode();
     }
 
     @Override

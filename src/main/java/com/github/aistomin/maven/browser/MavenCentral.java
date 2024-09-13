@@ -71,7 +71,7 @@ public final class MavenCentral implements MvnRepo {
     public List<MvnArtifact> findArtifacts(
         final String str
     ) throws MvnException {
-        return this.findArtifacts(str, 0, MavenCentral.MAX_ROWS);
+        return this.findArtifacts(str, 0, MAX_ROWS);
     }
 
     @Override
@@ -86,9 +86,9 @@ public final class MavenCentral implements MvnRepo {
                         this.repo, str, start, rows
                     )
                 ),
-                MavenCentral.ENCODING
+                ENCODING
             );
-            return MavenCentral.parseResponse(result)
+            return parseResponse(result)
                 .stream()
                 .map(MavenArtifact::new)
                 .collect(Collectors.toList());
@@ -101,7 +101,7 @@ public final class MavenCentral implements MvnRepo {
     public List<MvnArtifactVersion> findVersions(
         final MvnArtifact artifact
     ) throws MvnException {
-        return this.findVersions(artifact, 0, MavenCentral.MAX_ROWS);
+        return this.findVersions(artifact, 0, MAX_ROWS);
     }
 
     @Override
@@ -120,9 +120,9 @@ public final class MavenCentral implements MvnRepo {
                         rows
                     )
                 ),
-                MavenCentral.ENCODING
+                ENCODING
             );
-            return MavenCentral.parseResponse(res)
+            return parseResponse(res)
                 .stream()
                 .map(MavenArtifactVersion::new)
                 .collect(Collectors.toList());
@@ -148,7 +148,7 @@ public final class MavenCentral implements MvnRepo {
         return this.findArtifactVersionsWithFilter(
             version,
             (ver, current) ->
-                MavenCentral.isFirstVersionBiggerThanSecondVersion(current, ver)
+                isFirstVersionBiggerThanSecondVersion(current, ver)
         );
     }
 

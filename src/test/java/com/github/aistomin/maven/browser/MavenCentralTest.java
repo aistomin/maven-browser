@@ -242,7 +242,7 @@ final class MavenCentralTest {
                 new MavenGroup("org.junit.jupiter"),
                 "junit-jupiter-api"
             ),
-            "5.10.1",
+            "5.12.2",
             MvnPackagingType.JAR,
             System.currentTimeMillis()
         );

@@ -40,7 +40,7 @@
         </repository>
     </distributionManagement>
     <properties>
-        <junitVersion>5.12.2</junitVersion>
+        <junitVersion>5.13.0-M3</junitVersion>
         <javadocPluginVersion>3.11.2</javadocPluginVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>

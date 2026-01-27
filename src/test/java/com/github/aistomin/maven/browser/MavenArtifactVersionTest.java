@@ -123,6 +123,9 @@ final class MavenArtifactVersionTest {
 
     /**
      * Check that we properly assign and return the packaging of the artifact.
+     * Note: When using repo1.maven.org (maven-metadata.xml), packaging info
+     * is not available and defaults to JAR. This test verifies that behavior.
+     * Packaging from JSON constructor is tested in testConstruct().
      */
     @Test
     void testPackaging() throws Exception {
@@ -135,7 +138,7 @@ final class MavenArtifactVersionTest {
             );
         for (final MvnArtifactVersion version : versions) {
             Assertions.assertEquals(
-                MvnPackagingType.MAVEN_PLUGIN, version.packaging()
+                MvnPackagingType.JAR, version.packaging()
             );
         }
     }

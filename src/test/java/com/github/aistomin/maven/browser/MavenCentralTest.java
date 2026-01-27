@@ -114,7 +114,8 @@ final class MavenCentralTest {
      */
     @Test
     void testExceptions() {
-        final MvnRepo repo = new MavenCentral("http://not.existing.mvn/");
+        final String invalid = "http://not.existing.mvn/";
+        final MvnRepo repo = new MavenCentral(invalid, invalid);
         Assertions.assertThrows(
             MvnException.class,
             () -> repo.findArtifacts("someartifact")
@@ -262,19 +263,23 @@ final class MavenCentralTest {
 
     /**
      * Calculate a numeric representation of the version.
+     * Strips pre-release identifiers (like -M1, -RC1, -SNAPSHOT) before
+     * calculating, and uses a large multiplier to handle multi-digit parts.
      *
      * @param version The version.
      * @return The numeric representation.
      */
     private Double calculateNumberFromVersion(final String version) {
-        final String clean = version.replaceAll("[^\\d.]", "");
+        final String base = version.split("-")[0];
+        final String clean = base.replaceAll("[^\\d.]", "");
         final List<String> nums = Arrays.asList(clean.split("\\."));
+        final int multiplier = 1000;
         return IntStream
             .range(0, nums.size())
             .mapToDouble(
                 index ->
                 Integer.parseInt(nums.get(index))
-                    * Math.pow(MavenCentralTest.TEN, nums.size() - index - 1)
+                    * Math.pow(multiplier, nums.size() - index - 1)
             )
             .sum();
     }

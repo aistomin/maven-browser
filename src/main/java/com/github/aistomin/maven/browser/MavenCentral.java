@@ -16,21 +16,31 @@
 package com.github.aistomin.maven.browser;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.module.ModuleDescriptor.Version;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * The class which works with Maven Central repository.
- * URL: https://search.maven.org/
+ * Uses <a href="https://repo1.maven.org/maven2/">repo1.maven.org</a> for
+ * fetching artifact metadata (stable).
+ * Uses <a href="https://search.maven.org/">search.maven.org</a> for artifact
+ * search functionality.
  *
  * @since 0.1
  */
@@ -47,24 +57,34 @@ public final class MavenCentral implements MvnRepo {
     public static final String ENCODING = "UTF-8";
 
     /**
-     * The Maven repo base URL.
+     * The Maven repository base URL for fetching metadata.
      */
     private final String repo;
 
     /**
-     * Ctor.
-     *
-     * @param repository The Maven repo base URL.
+     * The Maven search API URL for artifact search.
      */
-    public MavenCentral(final String repository) {
+    private final String search;
+
+    /**
+     * Parametrised ctor.
+     *
+     * @param repository The Maven repo base URL for fetching metadata.
+     * @param searchApi The Maven search API URL.
+     */
+    public MavenCentral(final String repository, final String searchApi) {
         this.repo = repository;
+        this.search = searchApi;
     }
 
     /**
      * Ctor.
      */
     public MavenCentral() {
-        this("https://search.maven.org/solrsearch/select");
+        this(
+            "https://repo1.maven.org/maven2",
+            "https://search.maven.org/solrsearch/select"
+        );
     }
 
     @Override
@@ -83,12 +103,12 @@ public final class MavenCentral implements MvnRepo {
                 URI.create(
                     String.format(
                         "%s?q=%s&start=%d&rows=%d&wt=json",
-                        this.repo, str, start, rows
+                        this.search, str, start, rows
                     )
                 ),
                 ENCODING
             );
-            return parseResponse(result)
+            return parseJsonResponse(result)
                 .stream()
                 .map(MavenArtifact::new)
                 .collect(Collectors.toList());
@@ -109,24 +129,29 @@ public final class MavenCentral implements MvnRepo {
         final MvnArtifact artifact, final Integer start, final Integer rows
     ) throws MvnException {
         try {
-            final String res = IOUtils.toString(
-                URI.create(
-                    String.format(
-                        "%s?q=g:%s+AND+a:%s&core=gav&start=%d&rows=%d&wt=json",
-                        this.repo,
-                        artifact.group().name(),
-                        artifact.name(),
-                        start,
-                        rows
-                    )
-                ),
-                ENCODING
+            final String url = String.format(
+                "%s/%s/%s/maven-metadata.xml",
+                this.repo,
+                artifact.group().name().replace('.', '/'),
+                artifact.name()
             );
-            return parseResponse(res)
-                .stream()
-                .map(MavenArtifactVersion::new)
+            final List<String> allVersions = parseMetadataXml(
+                URI.create(url).toURL().openStream()
+            );
+            final int endIndex = Math.min(start + rows, allVersions.size());
+            final List<String> pagedVersions =
+                start < allVersions.size()
+                    ? allVersions.subList(start, endIndex)
+                    : new ArrayList<>();
+            return pagedVersions.stream()
+                .map(
+                    ver -> new MavenArtifactVersion(
+                        artifact, ver, MvnPackagingType.JAR, null
+                    )
+                )
                 .collect(Collectors.toList());
-        } catch (final ParseException | IOException exception) {
+        } catch (final IOException | ParserConfigurationException
+            | SAXException exception) {
             throw new MvnException(exception);
         }
     }
@@ -153,7 +178,7 @@ public final class MavenCentral implements MvnRepo {
     }
 
     /**
-     * Find all the versions of the artifact with filter.
+     * Find all the versions of the artifact with a filter.
      *
      * @param current Current version.
      * @param predicate The filter.
@@ -187,14 +212,14 @@ public final class MavenCentral implements MvnRepo {
     }
 
     /**
-     * Get the list of artifacts/versions from the Maven repo response.
+     * Get the list of artifacts/versions from the Maven search API response.
      *
-     * @param response Maven repo response.
+     * @param response Maven search API JSON response.
      * @return The list of JSON objects.
      * @throws ParseException If parsing wasn't successful.
      */
     @SuppressWarnings("unchecked")
-    private static List<JSONObject> parseResponse(
+    private static List<JSONObject> parseJsonResponse(
         final String response
     ) throws ParseException {
         return new ArrayList<JSONObject>(
@@ -203,6 +228,31 @@ public final class MavenCentral implements MvnRepo {
                     .get("response")
             ).get("docs")
         );
+    }
+
+    /**
+     * Parse maven-metadata.xml to extract a versions list.
+     * Returns versions in descending order (newest first).
+     *
+     * @param input The input stream of maven-metadata.xml.
+     * @return The list of version strings, newest first.
+     * @throws ParserConfigurationException If XML parser config fails.
+     * @throws SAXException If XML parsing fails.
+     * @throws IOException If reading fails.
+     */
+    private static List<String> parseMetadataXml(
+        final InputStream input
+    ) throws ParserConfigurationException, SAXException, IOException {
+        final Document doc = DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(input);
+        final NodeList versionNodes = doc.getElementsByTagName("version");
+        final List<String> versions = new ArrayList<>(versionNodes.getLength());
+        for (int i = 0; i < versionNodes.getLength(); i++) {
+            versions.add(versionNodes.item(i).getTextContent());
+        }
+        Collections.reverse(versions);
+        return versions;
     }
 
     /**

@@ -6,10 +6,12 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.aistomin/maven-browser)](https://central.sonatype.com/artifact/com.github.aistomin/maven-browser)
 [![javadoc](https://javadoc.io/badge2/com.github.aistomin/maven-browser/javadoc.svg)](https://javadoc.io/doc/com.github.aistomin/maven-browser)
 
-This Java library allows you to browse the Maven Central repository. It uses the
-[Maven Central API](https://search.maven.org/classic/#api) to retrieve data from the
-repository. The tool can be useful for developers who create CI scripts or other
-tools that need to read information from Maven repository.
+This Java library allows you to search and browse Maven Central. It uses the
+[Maven Central Search API](https://search.maven.org/classic/#api) for artifact
+lookup and the standard Maven repository layout at
+[repo1.maven.org](https://repo1.maven.org/maven2/) (`maven-metadata.xml`) for
+version information. The library can be useful for developers who create CI
+scripts or other tools that need to read information from Maven Central.
 
 ## Getting Started
 
@@ -20,32 +22,32 @@ tools that need to read information from Maven repository.
 
 ### Add Maven Dependency
 
-If you use Maven, add the following configuration to your project's `pom.xml`
+If you use Maven, add the following configuration to your project's `pom.xml`:
 
 ```maven
 <dependencies>
-    <!-- other dependencies are there -->
+    <!-- other dependencies -->
     <dependency>
         <groupId>com.github.aistomin</groupId>
         <artifactId>maven-browser</artifactId>
         <version>5.0</version>
     </dependency>
-    <!-- other dependencies are there -->
+    <!-- other dependencies -->
 </dependencies>
 ```
 
-or, if you use `Gradle`, add the following line to your build file:
+or, if you use Gradle, add the following line to your build file:
 
+```gradle
+implementation 'com.github.aistomin:maven-browser:5.0'
 ```
-compile 'com.github.aistomin:maven-browser:5.0'
-```
 
-### Read the Data from Maven Repository
+### Read Data from Maven Central
 
-We created some `Groovy` examples of how the library can be used. Please take a
+We created some Groovy examples of how the library can be used. Please take a
 look at the [examples here](https://github.com/aistomin/maven-browser/tree/master/examples).
 
-## Licence
+## License
 
 The project is licensed under the terms of the
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).

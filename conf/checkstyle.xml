@@ -93,7 +93,7 @@
             <property name="allowUnknownTags" value="true"/>
         </module>
         <module name="JavadocVariable"/>
-        <module name="JavadocStyle"/>
+        <module name="SummaryJavadoc"/>
         <module name="MissingJavadocMethod"/>
 
         <!-- Checks for Naming Conventions.                  -->

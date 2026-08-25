@@ -15,13 +15,13 @@
  */
 package com.github.aistomin.maven.browser;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.jupiter.api.Assertions;
@@ -61,11 +61,11 @@ final class MavenArtifactVersionTest {
         Assertions.assertEquals(type, modern.packaging());
         final MavenArtifactVersion json = new MavenArtifactVersion(
             (JSONObject) new JSONParser().parse(
-                FileUtils.readFileToString(
-                    new File(
+                Files.readString(
+                    Path.of(
                         Thread.currentThread().getContextClassLoader()
-                            .getResource("sample.json").getFile()
-                    ), "UTF-8"
+                            .getResource("sample.json").toURI()
+                    )
                 )
             )
         );

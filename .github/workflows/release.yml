@@ -3,19 +3,113 @@ name: Release to Maven Central
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to release (e.g., 5.0, 5.1)'
+      release-ticket:
+        description: 'Number of the "Release version X" issue of the milestone being released (e.g. 528)'
         required: true
         type: string
+      next-release-ticket:
+        description: 'Number of the "Release version Y" issue of the next milestone'
+        required: true
+        type: string
+      dry-run:
+        description: 'Validate and build, but do not publish, push, or close anything'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+
+    permissions:
+      contents: write
+      issues: write
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TICKET: ${{ inputs.release-ticket }}
+      NEXT_RELEASE_TICKET: ${{ inputs.next-release-ticket }}
+
     steps:
+      - name: Check that the workflow runs on master
+        if: github.ref != 'refs/heads/master'
+        run: |
+          echo "::error::Releases must be run from master, not ${{ github.ref }}."
+          exit 1
+
       - name: Checkout code
         uses: actions/checkout@v7
-      
+        with:
+          fetch-depth: 0
+
+      - name: Pre-flight validation
+        id: preflight
+        run: |
+          set -euo pipefail
+          repo="${{ github.repository }}"
+
+          derive_version() {
+            local ticket="$1"
+            local json state ms_title ms_state title version
+            json=$(gh api "repos/${repo}/issues/${ticket}")
+            state=$(jq -r '.state' <<< "${json}")
+            title=$(jq -r '.title' <<< "${json}")
+            ms_title=$(jq -r '.milestone.title // empty' <<< "${json}")
+            ms_state=$(jq -r '.milestone.state // empty' <<< "${json}")
+            if [ "${state}" != "open" ]; then
+              echo "::error::Issue #${ticket} ('${title}') is not open." >&2
+              return 1
+            fi
+            if ! grep -Eq '^Version [0-9]+\.[0-9]+(\.[0-9]+)?$' <<< "${ms_title}"; then
+              echo "::error::Issue #${ticket} has no milestone titled 'Version X.Y' (found: '${ms_title}')." >&2
+              return 1
+            fi
+            if [ "${ms_state}" != "open" ]; then
+              echo "::error::Milestone '${ms_title}' of issue #${ticket} is not open." >&2
+              return 1
+            fi
+            version="${ms_title#Version }"
+            if ! grep -qiF "release version ${version}" <<< "${title}"; then
+              echo "::error::Issue #${ticket} title ('${title}') does not mention 'Release version ${version}' — wrong ticket number?" >&2
+              return 1
+            fi
+            echo "${version}"
+          }
+
+          version=$(derive_version "${RELEASE_TICKET}")
+          next_version=$(derive_version "${NEXT_RELEASE_TICKET}")
+
+          if [ "${version}" = "${next_version}" ]; then
+            echo "::error::Release ticket and next release ticket belong to the same milestone (Version ${version})."
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/v${version}" > /dev/null; then
+            echo "::error::Tag v${version} already exists."
+            exit 1
+          fi
+
+          milestone_json=$(gh api "repos/${repo}/issues/${RELEASE_TICKET}" --jq '.milestone')
+          milestone_number=$(jq -r '.number' <<< "${milestone_json}")
+          open_issues=$(jq -r '.open_issues' <<< "${milestone_json}")
+          if [ "${open_issues}" -ne 1 ]; then
+            echo "::error::Milestone 'Version ${version}' still has open issues other than #${RELEASE_TICKET}:"
+            gh issue list --repo "${repo}" --milestone "Version ${version}" --state open \
+              --json number,title --jq '.[] | select(.number != ('"${RELEASE_TICKET}"' | tonumber)) | "#\(.number) \(.title)"'
+            exit 1
+          fi
+
+          echo "Releasing version ${version}; master will move to ${next_version}-SNAPSHOT."
+          {
+            echo "version=${version}"
+            echo "next_version=${next_version}"
+            echo "milestone_number=${milestone_number}"
+          } >> "${GITHUB_OUTPUT}"
+
       - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
@@ -27,13 +121,93 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
-      
-      - name: Set version
-        run: mvn versions:set -DnewVersion=${{ inputs.version }}
-      
-      - name: Build and Deploy to Maven Central
+
+      - name: Bump version references
+        run: |
+          set -euo pipefail
+          version="${{ steps.preflight.outputs.version }}"
+
+          mvn --batch-mode versions:set -DnewVersion="${version}" -DgenerateBackupPoms=false
+          sed -i "s|<version>[0-9][0-9.]*</version>|<version>${version}</version>|" README.md
+          sed -i "s|maven-browser:[0-9][0-9.]*|maven-browser:${version}|" README.md
+          sed -i "s|version = '[0-9][0-9.]*'|version = '${version}'|" \
+            examples/ReadingRepoExample.groovy examples/AddDependencyToPomFile.groovy
+
+          grep -q "<version>${version}</version>" pom.xml
+          grep -q "<version>${version}</version>" README.md
+          grep -q "maven-browser:${version}" README.md
+          grep -q "version = '${version}'" examples/ReadingRepoExample.groovy
+          grep -q "version = '${version}'" examples/AddDependencyToPomFile.groovy
+
+      - name: Create release commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pom.xml README.md examples/ReadingRepoExample.groovy examples/AddDependencyToPomFile.groovy
+          git commit \
+            -m "ci(#${RELEASE_TICKET}): release version ${{ steps.preflight.outputs.version }}" \
+            -m "Closes #${RELEASE_TICKET}"
+
+      - name: Build and deploy to Maven Central
+        if: ${{ !inputs.dry-run }}
         run: mvn clean deploy -P release
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Build without deploying (dry run)
+        if: ${{ inputs.dry-run }}
+        run: mvn clean install -P release
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Push release commit and create GitHub release
+        if: ${{ !inputs.dry-run }}
+        run: |
+          set -euo pipefail
+          version="${{ steps.preflight.outputs.version }}"
+          git push origin HEAD:master
+          gh release create "v${version}" \
+            --title "Version ${version}" \
+            --generate-notes \
+            --target "$(git rev-parse HEAD)"
+
+      - name: Prepare next development iteration
+        if: ${{ !inputs.dry-run }}
+        run: |
+          set -euo pipefail
+          next="${{ steps.preflight.outputs.next_version }}-SNAPSHOT"
+          mvn --batch-mode versions:set -DnewVersion="${next}" -DgenerateBackupPoms=false
+          git commit -am "chore(#${RELEASE_TICKET}): prepare next development iteration ${next}"
+          git push origin HEAD:master
+
+      - name: Close release ticket and milestone
+        if: ${{ !inputs.dry-run }}
+        run: |
+          set -euo pipefail
+          repo="${{ github.repository }}"
+          gh api -X PATCH "repos/${repo}/issues/${RELEASE_TICKET}" -f state=closed > /dev/null
+          gh api -X PATCH "repos/${repo}/milestones/${{ steps.preflight.outputs.milestone_number }}" \
+            -f state=closed > /dev/null
+
+      - name: Write job summary
+        run: |
+          set -euo pipefail
+          version="${{ steps.preflight.outputs.version }}"
+          next="${{ steps.preflight.outputs.next_version }}"
+          {
+            if [ "${{ inputs.dry-run }}" = "true" ]; then
+              echo "## Dry run of release ${version} :white_check_mark:"
+              echo ""
+              echo "Nothing was published, pushed, or closed."
+            else
+              echo "## Released version ${version} :rocket:"
+              echo ""
+              echo "- Release: https://github.com/${{ github.repository }}/releases/tag/v${version}"
+              echo "- Maven Central: https://central.sonatype.com/artifact/com.github.aistomin/maven-browser/${version}"
+              echo "- Closed ticket #${RELEASE_TICKET} and milestone 'Version ${version}'."
+              echo "- master is now at ${next}-SNAPSHOT."
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"

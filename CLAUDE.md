@@ -89,9 +89,17 @@ snippets.
 
 ## Releasing
 
-Releases go through the manual `release.yml` GitHub Actions workflow (workflow_dispatch with
-a version input); it uses the `release` Maven profile (sources/javadoc jars, GPG signing,
-central-publishing-maven-plugin). Don't run the release profile locally.
+Releases go through the manual `release.yml` GitHub Actions workflow (workflow_dispatch,
+run from `master`). It takes two issue numbers as inputs — the "Release version X" ticket
+of the milestone being released and the one of the next milestone — plus an optional
+`dry-run` flag. Versions are derived from the tickets' milestone titles (`Version X.Y`).
+The workflow does everything end-to-end: validates the tickets/milestone/tag, bumps the
+version in `pom.xml`, `README.md`, and the examples, deploys to Maven Central via the
+`release` Maven profile (sources/javadoc jars, GPG signing,
+central-publishing-maven-plugin), pushes the release commit and a follow-up
+next-`SNAPSHOT` commit to `master`, creates the `v<version>` GitHub release with
+generated notes, and closes the release ticket and the milestone. No version branch is
+created (the old `5.0`-style branches are legacy). Don't run the release profile locally.
 
 ## Git conventions
 
@@ -139,6 +147,37 @@ gh issue create --title "<title>" --body "<body>" --assignee aistomin --mileston
 Afterwards, verify the issue actually carries the assignee and milestone
 (`gh issue view <n> --json assignees,milestone`) — a bad `--milestone` string fails silently
 in some `gh` versions.
+
+### Opening a new milestone
+
+When the user asks to open a milestone for version `X.Y`, always ask them for the
+description and the due date — never assume either — then show the full draft (milestone
+plus release issue) and get approval before creating anything. On the go:
+
+1. Create the milestone titled `Version X.Y` with the agreed description and due date
+   (`gh api repos/aistomin/maven-browser/milestones -f title=... -f description=...
+   -f due_on=...`).
+2. Create its release issue in that milestone: title `Release version X.Y`, assignee
+   `aistomin`. The release issue always goes into the milestone just created — this
+   deliberately overrides the "highest-numbered open milestone" rule above. Body template:
+
+   ```markdown
+   Let's release version X.Y once all the other issues in this milestone are solved.
+
+   Release steps:
+   - [ ] All other issues in the milestone "Version X.Y" are closed or moved out.
+   - [ ] The next milestone and its release ticket exist.
+   - [ ] Run the "Release to Maven Central" workflow (optionally with a dry run first),
+         with this ticket as `release-ticket` and the next milestone's release ticket
+         as `next-release-ticket`.
+
+   Please read [how to contribute](https://github.com/aistomin/maven-browser?tab=readme-ov-file#how-to-contribute)
+   ```
+
+Only when the user explicitly asks for it, migrate issues from the milestone that is
+about to be released: move all still-open issues of the old milestone to the new one,
+**except the old milestone's own release ticket** — it must stay, so the release workflow
+can close it together with the milestone. Closed issues stay where they are.
 
 ### Solving a ticket
 

@@ -110,6 +110,70 @@ final class MavenCentralTest {
     }
 
     /**
+     * Check that we can search using a string which contains a space.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindArtifactsWithSpace() throws Exception {
+        Assertions.assertFalse(
+            new MavenCentral().findArtifacts("guice inject").isEmpty()
+        );
+    }
+
+    /**
+     * Check that we can search using the Maven search API field syntax, which
+     * contains characters that are not allowed in a URL.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindArtifactsWithFieldQuery() throws Exception {
+        final String group = this.mine.group().name();
+        final List<MvnArtifact> found = new MavenCentral().findArtifacts(
+            String.format("g:\"%s\"", group)
+        );
+        Assertions.assertFalse(found.isEmpty());
+        Assertions.assertTrue(found.contains(this.mine));
+        found.forEach(
+            artifact ->
+                Assertions.assertEquals(group, artifact.group().name())
+        );
+    }
+
+    /**
+     * Check that the request parameters can not be injected via the search
+     * string.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindArtifactsIgnoresInjectedParameters() throws Exception {
+        Assertions.assertTrue(
+            new MavenCentral()
+                .findArtifacts("a&rows=1000", 0, MavenCentralTest.FIVE)
+                .size() <= MavenCentralTest.FIVE
+        );
+    }
+
+    /**
+     * Check that an artifact whose coordinates contain a character which is not
+     * allowed in a URL fails with {@link MvnException} rather than with an
+     * unchecked exception.
+     */
+    @Test
+    void testFindVersionsWithSpaceInCoordinates() {
+        Assertions.assertThrows(
+            MvnException.class,
+            () -> new MavenCentral().findVersions(
+                new MavenArtifact(
+                    new MavenGroup("com.github aistomin"), "jenkins sdk"
+                )
+            )
+        );
+    }
+
+    /**
      * Check that we correctly throw exceptions if something went wrong.
      */
     @Test

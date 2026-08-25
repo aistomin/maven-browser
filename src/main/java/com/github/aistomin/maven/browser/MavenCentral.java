@@ -17,7 +17,6 @@ package com.github.aistomin.maven.browser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.module.ModuleDescriptor.Version;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -30,6 +29,7 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -270,7 +270,9 @@ public final class MavenCentral implements MvnRepo {
     }
 
     /**
-     * Check if one version is bigger than another.
+     * Check if one version is bigger than another. The versions are ordered
+     * using Maven's own rules, so any version string can be compared and the
+     * qualifiers are ranked the way Maven ranks them.
      *
      * @param first Version A.
      * @param second Version B.
@@ -281,7 +283,7 @@ public final class MavenCentral implements MvnRepo {
         final MvnArtifactVersion first,
         final MvnArtifactVersion second
     ) {
-        return Version.parse(first.name())
-            .compareTo(Version.parse(second.name())) > 0;
+        return new ComparableVersion(first.name())
+            .compareTo(new ComparableVersion(second.name())) > 0;
     }
 }

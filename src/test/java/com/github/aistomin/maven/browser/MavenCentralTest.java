@@ -52,6 +52,15 @@ final class MavenCentralTest {
     );
 
     /**
+     * Guava. Its version history contains both non-numeric versions
+     * (r03 ... r09) and qualified ones (10.0-rc1), which is exactly what the
+     * version comparison needs to be checked against.
+     */
+    private final MvnArtifact guava = new MavenArtifact(
+        new MavenGroup("com.google.guava"), "guava"
+    );
+
+    /**
      * The list of the versions of my artifact which we use for this test.
      */
     private final List<String> vers = Arrays.asList(
@@ -294,6 +303,40 @@ final class MavenCentralTest {
     }
 
     /**
+     * Check that a version which does not start with a digit does not break
+     * the search of the newer versions.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsNewerThanNonNumericVersion() throws Exception {
+        final List<String> newer = names(
+            new MavenCentral().findVersionsNewerThan(this.guavaVersion("r09"))
+        );
+        Assertions.assertFalse(newer.isEmpty());
+        Assertions.assertTrue(newer.contains("10.0"));
+        Assertions.assertFalse(newer.contains("r03"));
+        Assertions.assertFalse(newer.contains("r09"));
+    }
+
+    /**
+     * Check that the versions are ordered using Maven's rules: a release
+     * candidate is older than the release, and a non-numeric version is older
+     * than a numeric one.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsOlderThanQualifiedVersion() throws Exception {
+        final List<String> older = names(
+            new MavenCentral().findVersionsOlderThan(this.guavaVersion("10.0"))
+        );
+        Assertions.assertTrue(older.contains("10.0-rc1"));
+        Assertions.assertTrue(older.contains("r09"));
+        Assertions.assertFalse(older.contains("10.0.1"));
+    }
+
+    /**
      * Check that we correctly find the versions which are newer than provided
      * one.
      *
@@ -323,6 +366,30 @@ final class MavenCentralTest {
                 )
             );
         }
+    }
+
+    /**
+     * Create a version of Guava.
+     *
+     * @param name The version's name.
+     * @return The version.
+     */
+    private MvnArtifactVersion guavaVersion(final String name) {
+        return new MavenArtifactVersion(
+            this.guava, name, MvnPackagingType.JAR, System.currentTimeMillis()
+        );
+    }
+
+    /**
+     * Extract the names of the versions.
+     *
+     * @param versions The versions.
+     * @return The names of the versions.
+     */
+    private static List<String> names(
+        final List<MvnArtifactVersion> versions
+    ) {
+        return versions.stream().map(MvnArtifactVersion::name).toList();
     }
 
     /**

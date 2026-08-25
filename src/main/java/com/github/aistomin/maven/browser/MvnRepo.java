@@ -26,6 +26,8 @@ public interface MvnRepo {
 
     /**
      * Search for the artifacts. Returns first 20 found artifacts.
+     * The search string is URL-encoded before it is sent to the repository, so
+     * it may safely contain spaces and other special characters.
      *
      * @param str The search string. It may be a part of group or artifact name.
      * @return The list of the found artifacts.
@@ -35,6 +37,8 @@ public interface MvnRepo {
 
     /**
      * Search for the artifacts.
+     * The search string is URL-encoded before it is sent to the repository, so
+     * it may safely contain spaces and other special characters.
      *
      * @param str The search string. It may be a part of group or artifact name.
      * @param start The start index of the search.

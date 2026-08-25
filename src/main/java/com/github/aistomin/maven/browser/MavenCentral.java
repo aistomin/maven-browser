@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.module.ModuleDescriptor.Version;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -103,7 +106,10 @@ public final class MavenCentral implements MvnRepo {
                 URI.create(
                     String.format(
                         "%s?q=%s&start=%d&rows=%d&wt=json",
-                        this.search, str, start, rows
+                        this.search,
+                        URLEncoder.encode(str, StandardCharsets.UTF_8),
+                        start,
+                        rows
                     )
                 ),
                 ENCODING
@@ -130,10 +136,18 @@ public final class MavenCentral implements MvnRepo {
     ) throws MvnException {
         try {
             final String url = String.format(
-                "%s/%s/%s/maven-metadata.xml",
+                "%s%s",
                 this.repo,
-                artifact.group().name().replace('.', '/'),
-                artifact.name()
+                new URI(
+                    null,
+                    null,
+                    String.format(
+                        "/%s/%s/maven-metadata.xml",
+                        artifact.group().name().replace('.', '/'),
+                        artifact.name()
+                    ),
+                    null
+                ).toASCIIString()
             );
             final List<String> allVersions = parseMetadataXml(
                 URI.create(url).toURL().openStream()
@@ -151,7 +165,7 @@ public final class MavenCentral implements MvnRepo {
                 )
                 .collect(Collectors.toList());
         } catch (final IOException | ParserConfigurationException
-            | SAXException exception) {
+            | SAXException | URISyntaxException exception) {
             throw new MvnException(exception);
         }
     }

@@ -17,10 +17,16 @@ package com.github.aistomin.maven.browser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +34,6 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -60,6 +65,21 @@ public final class MavenCentral implements MvnRepo {
     public static final String ENCODING = "UTF-8";
 
     /**
+     * Default time we wait until the connection to the repository is
+     * established.
+     */
+    public static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
+
+    /**
+     * Default time we wait for the repository's response. Maven Central
+     * usually answers in a fraction of a second, but it is known to stall for
+     * a minute and more from time to time, that's why the default is that
+     * generous. Use the parametrised ctor if your use case needs to give up
+     * earlier.
+     */
+    public static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(120);
+
+    /**
      * The Maven repository base URL for fetching metadata.
      */
     private final String repo;
@@ -70,14 +90,46 @@ public final class MavenCentral implements MvnRepo {
     private final String search;
 
     /**
+     * The HTTP client which we use to talk to the repository.
+     */
+    private final HttpClient client;
+
+    /**
+     * The time we wait for the repository's response.
+     */
+    private final Duration response;
+
+    /**
      * Parametrised ctor.
+     *
+     * @param repository The Maven repo base URL for fetching metadata.
+     * @param searchApi The Maven search API URL.
+     * @param connect The time we wait until the connection is established.
+     * @param timeout The time we wait for the repository's response.
+     */
+    public MavenCentral(
+        final String repository,
+        final String searchApi,
+        final Duration connect,
+        final Duration timeout
+    ) {
+        this.repo = repository;
+        this.search = searchApi;
+        this.response = timeout;
+        this.client = HttpClient.newBuilder()
+            .connectTimeout(connect)
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
+    }
+
+    /**
+     * Parametrised ctor. The default timeouts are used.
      *
      * @param repository The Maven repo base URL for fetching metadata.
      * @param searchApi The Maven search API URL.
      */
     public MavenCentral(final String repository, final String searchApi) {
-        this.repo = repository;
-        this.search = searchApi;
+        this(repository, searchApi, CONNECT_TIMEOUT, REQUEST_TIMEOUT);
     }
 
     /**
@@ -102,22 +154,23 @@ public final class MavenCentral implements MvnRepo {
         final String str, final Integer start, final Integer rows
     ) throws MvnException {
         try {
-            final String result = IOUtils.toString(
-                URI.create(
-                    String.format(
-                        "%s?q=%s&start=%d&rows=%d&wt=json",
-                        this.search,
-                        URLEncoder.encode(str, StandardCharsets.UTF_8),
-                        start,
-                        rows
-                    )
+            final String result = this.get(
+                String.format(
+                    "%s?q=%s&start=%d&rows=%d&wt=json",
+                    this.search,
+                    URLEncoder.encode(str, StandardCharsets.UTF_8),
+                    start,
+                    rows
                 ),
-                ENCODING
+                HttpResponse.BodyHandlers.ofString(Charset.forName(ENCODING))
             );
             return parseJsonResponse(result)
                 .stream()
                 .map(MavenArtifact::new)
                 .collect(Collectors.toList());
+        } catch (final InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new MvnException(exception);
         } catch (final ParseException | IOException exception) {
             throw new MvnException(exception);
         }
@@ -150,7 +203,7 @@ public final class MavenCentral implements MvnRepo {
                 ).toASCIIString()
             );
             final List<String> allVersions = parseMetadataXml(
-                URI.create(url).toURL().openStream()
+                this.get(url, HttpResponse.BodyHandlers.ofInputStream())
             );
             final int endIndex = Math.min(start + rows, allVersions.size());
             final List<String> pagedVersions =
@@ -164,6 +217,9 @@ public final class MavenCentral implements MvnRepo {
                     )
                 )
                 .collect(Collectors.toList());
+        } catch (final InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new MvnException(exception);
         } catch (final IOException | ParserConfigurationException
             | SAXException | URISyntaxException exception) {
             throw new MvnException(exception);
@@ -189,6 +245,37 @@ public final class MavenCentral implements MvnRepo {
             (ver, current) ->
                 isFirstVersionBiggerThanSecondVersion(current, ver)
         );
+    }
+
+    /**
+     * Send a GET request to the repository and read the response's body.
+     *
+     * @param url The URL we read from.
+     * @param handler The handler which converts the response's body.
+     * @param <T> The type of the response's body.
+     * @return The response's body.
+     * @throws IOException If the request failed or the repository answered
+     *  with an unsuccessful status.
+     * @throws InterruptedException If the request was interrupted.
+     */
+    private <T> T get(
+        final String url, final HttpResponse.BodyHandler<T> handler
+    ) throws IOException, InterruptedException {
+        final HttpResponse<T> answer = this.client.send(
+            HttpRequest.newBuilder(URI.create(url))
+                .timeout(this.response)
+                .GET()
+                .build(),
+            handler
+        );
+        final int status = answer.statusCode();
+        if (status < HttpURLConnection.HTTP_OK
+            || status >= HttpURLConnection.HTTP_MULT_CHOICE) {
+            throw new IOException(
+                String.format("Got HTTP %d reading %s.", status, url)
+            );
+        }
+        return answer.body();
     }
 
     /**

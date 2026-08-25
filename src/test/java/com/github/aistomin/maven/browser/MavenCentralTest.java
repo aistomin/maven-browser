@@ -15,6 +15,9 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.net.ServerSocket;
+import java.net.http.HttpTimeoutException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -337,6 +340,46 @@ final class MavenCentralTest {
     }
 
     /**
+     * Check that the search does not hang forever if the repository accepts
+     * the connection but never answers.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindArtifactsTimesOut() throws Exception {
+        try (ServerSocket silent = new ServerSocket(0)) {
+            final MvnRepo mvn = MavenCentralTest.impatient(silent);
+            Assertions.assertInstanceOf(
+                HttpTimeoutException.class,
+                Assertions.assertThrows(
+                    MvnException.class,
+                    () -> mvn.findArtifacts("guice")
+                ).getCause()
+            );
+        }
+    }
+
+    /**
+     * Check that the versions search does not hang forever if the repository
+     * accepts the connection but never answers.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsTimesOut() throws Exception {
+        try (ServerSocket silent = new ServerSocket(0)) {
+            final MvnRepo mvn = MavenCentralTest.impatient(silent);
+            Assertions.assertInstanceOf(
+                HttpTimeoutException.class,
+                Assertions.assertThrows(
+                    MvnException.class,
+                    () -> mvn.findVersions(this.mine)
+                ).getCause()
+            );
+        }
+    }
+
+    /**
      * Check that we correctly find the versions which are newer than provided
      * one.
      *
@@ -366,6 +409,23 @@ final class MavenCentralTest {
                 )
             );
         }
+    }
+
+    /**
+     * Create a repository which talks to the given socket and gives up almost
+     * immediately. The socket is never accepted, so the connection is
+     * established by the OS and the "server" stays silent forever.
+     *
+     * @param silent The socket which never answers.
+     * @return The repository.
+     */
+    private static MvnRepo impatient(final ServerSocket silent) {
+        final String url = String.format(
+            "http://127.0.0.1:%d", silent.getLocalPort()
+        );
+        return new MavenCentral(
+            url, url, Duration.ofSeconds(1), Duration.ofSeconds(1)
+        );
     }
 
     /**

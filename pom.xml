@@ -281,16 +281,13 @@
                 <version>${javadocPluginVersion}</version>
                 <configuration>
                     <source>21</source>
-                    <doclint>none</doclint>
-                    <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</additionalJOption>
-                    <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</additionalJOption>
-                    <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</additionalJOption>
-                    <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</additionalJOption>
-                    <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</additionalJOption>
-                    <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</additionalJOption>
-                    <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</additionalJOption>
-                    <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</additionalJOption>
-                    <additionalJOption>--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</additionalJOption>
+                    <!-- Check the content of the Javadoc comments, not only
+                         their presence: broken references, tags which do not
+                         match the signature, invalid HTML. Warnings fail the
+                         build too, otherwise the warning-level findings would
+                         pile up unnoticed. -->
+                    <doclint>all</doclint>
+                    <failOnWarnings>true</failOnWarnings>
                     <tags>
                         <tag>
                             <name>checkstyle</name>

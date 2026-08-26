@@ -62,6 +62,10 @@ Notes on the build:
   violation. Rules are strict: mandatory Javadoc on all methods, fields, and types
   (including tests), line-length limits, naming rules, `final` parameters, etc. Match the
   existing files' Javadoc/comment style exactly or the build breaks before compiling.
+- Javadoc runs at `package` (the `attach-javadocs` execution) with `-Xdoclint:all` and
+  `failOnWarnings`, so a broken `{@link}`, a `@param` that does not match the signature or
+  invalid HTML in a comment **fails the build** — Checkstyle checks that Javadoc exists,
+  doclint checks that it is correct.
 - PMD, duplicate-finder, and `maven-dependencies-analyser` run at `verify`.
 - JaCoCo enforces **90% line coverage per package** (`jacoco:check`); new code needs tests.
 - Tests are JUnit 5 (Jupiter). `MavenCentralTest` hits the real Maven Central network APIs,

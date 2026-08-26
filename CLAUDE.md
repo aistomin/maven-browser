@@ -44,7 +44,7 @@ browsing Maven Central. It is published to Maven Central as
 
 ```bash
 # Full build — run this before submitting any PR (per README contribution guidelines)
-mvn clean install package javadoc:javadoc
+mvn clean install
 
 # Tests only
 mvn test
@@ -222,7 +222,7 @@ to push.
    The verification command is the full Maven build:
 
    ```bash
-   mvn clean install package javadoc:javadoc
+   mvn clean install
    ```
 
    It needs JDK 21 and network access (`MavenCentralTest` calls the real Maven Central

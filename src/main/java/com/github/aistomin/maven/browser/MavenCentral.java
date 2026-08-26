@@ -80,6 +80,15 @@ public final class MavenCentral implements MvnRepo {
     public static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(120);
 
     /**
+     * The XML parser feature which forbids a DTD in the parsed document. A
+     * legitimate maven-metadata.xml never contains one, so forbidding it costs
+     * us nothing and takes away the ground under both XXE and entity
+     * expansion attacks: neither works without a DTD.
+     */
+    private static final String NO_DOCTYPE =
+        "http://apache.org/xml/features/disallow-doctype-decl";
+
+    /**
      * The Maven repository base URL for fetching metadata.
      */
     private final String repo;
@@ -334,6 +343,11 @@ public final class MavenCentral implements MvnRepo {
     /**
      * Parse maven-metadata.xml to extract a versions list.
      * Returns versions in descending order (newest first).
+     * The repository URL is a public constructor parameter, so the answer we
+     * parse here is not necessarily trustworthy. The parser is therefore
+     * hardened before it is used: a document with a DTD is rejected instead
+     * of being parsed, and neither external entities nor XInclude are
+     * resolved.
      *
      * @param input The input stream of maven-metadata.xml.
      * @return The list of version strings, newest first.
@@ -344,9 +358,12 @@ public final class MavenCentral implements MvnRepo {
     private static List<String> parseMetadataXml(
         final InputStream input
     ) throws ParserConfigurationException, SAXException, IOException {
-        final Document doc = DocumentBuilderFactory.newInstance()
-            .newDocumentBuilder()
-            .parse(input);
+        final DocumentBuilderFactory factory =
+            DocumentBuilderFactory.newInstance();
+        factory.setFeature(NO_DOCTYPE, true);
+        factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
+        final Document doc = factory.newDocumentBuilder().parse(input);
         final NodeList versionNodes = doc.getElementsByTagName("version");
         final List<String> versions = new ArrayList<>(versionNodes.getLength());
         for (int i = 0; i < versionNodes.getLength(); i++) {

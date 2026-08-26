@@ -127,8 +127,8 @@ Every issue must have all three of:
    ```
 
 2. **Assignee `aistomin`.**
-3. **The highest-numbered open milestone** (as of milestone 15 that is `Version 5.1`).
-   Resolve it at creation time rather than hardcoding:
+3. **The highest-numbered open milestone.** Never hardcode it — it moves with every
+   release, so resolve it at creation time:
 
    ```bash
    gh api repos/aistomin/maven-browser/milestones \

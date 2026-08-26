@@ -67,7 +67,7 @@ your changes and merge them to the master branch if they meet our guidelines.
 To avoid frustration, before sending us your pull request please run the full Maven build:
 
 ```
-$ mvn clean install package javadoc:javadoc
+$ mvn clean install
 ```
 
 Keep in mind our [system requirements](#system-requirements).

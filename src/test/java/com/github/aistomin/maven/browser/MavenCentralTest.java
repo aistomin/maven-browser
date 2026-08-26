@@ -15,8 +15,16 @@
  */
 package com.github.aistomin.maven.browser;
 
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.http.HttpTimeoutException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +32,8 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.xml.sax.SAXParseException;
 
 /**
  * The tests for {@link MavenCentral}.
@@ -380,6 +390,77 @@ final class MavenCentralTest {
     }
 
     /**
+     * Check that a metadata file which declares a DTD is rejected instead of
+     * being parsed. Such a file is the vehicle for XXE: the entity below
+     * points at a local file, and an unhardened parser would happily read it
+     * and hand its content back as a version name.
+     *
+     * @param dir The temporary directory with the "secret" file.
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsRejectsMaliciousDoctype(
+        @TempDir final Path dir
+    ) throws Exception {
+        final Path secret = dir.resolve("secret.txt");
+        Files.writeString(secret, "top-secret");
+        final HttpServer server = MavenCentralTest.serving(
+            String.join(
+                "",
+                "<?xml version=\"1.0\"?>",
+                "<!DOCTYPE metadata [",
+                String.format("<!ENTITY xxe SYSTEM \"%s\">", secret.toUri()),
+                "]>",
+                "<metadata><versioning><versions>",
+                "<version>&xxe;</version>",
+                "</versions></versioning></metadata>"
+            )
+        );
+        try {
+            final MvnRepo mvn = MavenCentralTest.talkingTo(server);
+            final Throwable cause = Assertions.assertThrows(
+                MvnException.class,
+                () -> mvn.findVersions(this.mine)
+            ).getCause();
+            Assertions.assertInstanceOf(SAXParseException.class, cause);
+            Assertions.assertTrue(
+                cause.getMessage().contains("DOCTYPE"), cause.getMessage()
+            );
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    /**
+     * Check that hardening the parser did not break the parsing of an
+     * ordinary metadata file.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsParsesPlainMetadata() throws Exception {
+        final HttpServer server = MavenCentralTest.serving(
+            String.join(
+                "",
+                "<?xml version=\"1.0\"?>",
+                "<metadata><versioning><versions>",
+                "<version>1.0</version><version>2.0</version>",
+                "</versions></versioning></metadata>"
+            )
+        );
+        try {
+            Assertions.assertEquals(
+                Arrays.asList("2.0", "1.0"),
+                MavenCentralTest.names(
+                    MavenCentralTest.talkingTo(server).findVersions(this.mine)
+                )
+            );
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    /**
      * Check that we correctly find the versions which are newer than provided
      * one.
      *
@@ -426,6 +507,48 @@ final class MavenCentralTest {
         return new MavenCentral(
             url, url, Duration.ofSeconds(1), Duration.ofSeconds(1)
         );
+    }
+
+    /**
+     * Create a repository which reads its metadata from the given local
+     * server.
+     *
+     * @param server The server which answers the requests.
+     * @return The repository.
+     */
+    private static MvnRepo talkingTo(final HttpServer server) {
+        final String url = String.format(
+            "http://127.0.0.1:%d", server.getAddress().getPort()
+        );
+        return new MavenCentral(url, url);
+    }
+
+    /**
+     * Start a local HTTP server which answers every request with the given
+     * body. The caller has to stop it.
+     *
+     * @param body The body of the answer.
+     * @return The started server.
+     * @throws IOException If the server can not be started.
+     */
+    private static HttpServer serving(final String body) throws IOException {
+        final byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        final HttpServer server = HttpServer.create(
+            new InetSocketAddress("127.0.0.1", 0), 0
+        );
+        server.createContext(
+            "/",
+            exchange -> {
+                exchange.sendResponseHeaders(
+                    HttpURLConnection.HTTP_OK, bytes.length
+                );
+                try (OutputStream out = exchange.getResponseBody()) {
+                    out.write(bytes);
+                }
+            }
+        );
+        server.start();
+        return server;
     }
 
     /**

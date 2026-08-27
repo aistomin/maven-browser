@@ -15,8 +15,6 @@
  */
 package com.github.aistomin.maven.browser;
 
-import org.json.simple.JSONObject;
-
 /**
  * Simple implementation of the Maven artifact entity.
  *
@@ -48,15 +46,6 @@ public final class MavenArtifact implements MvnArtifact {
     public MavenArtifact(final MvnGroup group, final String name) {
         this.artifact = name;
         this.grp = group;
-    }
-
-    /**
-     * Ctor.
-     *
-     * @param json JSON object.
-     */
-    public MavenArtifact(final JSONObject json) {
-        this(new MavenGroup(json), (String) json.get("a"));
     }
 
     @Override

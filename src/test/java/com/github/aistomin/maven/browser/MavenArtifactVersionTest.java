@@ -15,15 +15,11 @@
  */
 package com.github.aistomin.maven.browser;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -41,11 +37,9 @@ final class MavenArtifactVersionTest {
 
     /**
      * Check that we assign and return the encapsulated fields properly.
-     *
-     * @throws Exception If something goes wrong.
      */
     @Test
-    void testConstruct() throws Exception {
+    void testConstruct() {
         final MvnArtifact artifact = new MavenArtifact(
             new MavenGroup(UUID.randomUUID().toString()),
             UUID.randomUUID().toString()
@@ -53,28 +47,18 @@ final class MavenArtifactVersionTest {
         final String name = UUID.randomUUID().toString();
         final MvnPackagingType[] types = MvnPackagingType.values();
         final MvnPackagingType type = types[new Random().nextInt(types.length)];
-        final MvnArtifactVersion modern = new MavenArtifactVersion(
-            artifact, name, type, System.currentTimeMillis()
+        final MvnArtifactVersion version = new MavenArtifactVersion(
+            artifact, name, type, MavenArtifactVersionTest.TIMESTAMP
         );
-        Assertions.assertEquals(name, modern.name());
-        Assertions.assertEquals(artifact, modern.artifact());
-        Assertions.assertEquals(type, modern.packaging());
-        final MavenArtifactVersion json = new MavenArtifactVersion(
-            (JSONObject) new JSONParser().parse(
-                Files.readString(
-                    Path.of(
-                        Thread.currentThread().getContextClassLoader()
-                            .getResource("sample.json").toURI()
-                    )
-                )
-            )
-        );
-        Assertions.assertEquals("0.2.1", json.name());
+        Assertions.assertEquals(name, version.name());
+        Assertions.assertEquals(artifact, version.artifact());
+        Assertions.assertEquals(type, version.packaging());
         Assertions.assertEquals(
-            MavenArtifactVersionTest.TIMESTAMP, json.releaseTimestamp()
+            MavenArtifactVersionTest.TIMESTAMP, version.releaseTimestamp()
         );
         Assertions.assertEquals(
-            MvnPackagingType.MAVEN_PLUGIN, json.packaging()
+            String.format("%s:%s", artifact.identifier(), name),
+            version.identifier()
         );
     }
 
@@ -125,7 +109,7 @@ final class MavenArtifactVersionTest {
      * Check that we properly assign and return the packaging of the artifact.
      * Note: When using repo1.maven.org (maven-metadata.xml), packaging info
      * is not available and defaults to JAR. This test verifies that behavior.
-     * Packaging from JSON constructor is tested in testConstruct().
+     * The packaging which is passed to the ctor is checked in testConstruct().
      */
     @Test
     void testPackaging() throws Exception {

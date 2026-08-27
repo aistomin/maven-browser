@@ -15,6 +15,7 @@
  */
 package com.github.aistomin.maven.browser;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -176,6 +177,89 @@ final class MavenCentralTest {
                 .findArtifacts("a&rows=1000", 0, MavenCentralTest.FIVE)
                 .size() <= MavenCentralTest.FIVE
         );
+    }
+
+    /**
+     * Check that the artifacts are read out of a search answer which has the
+     * shape the real search API produces: the documents sit in "docs" inside
+     * "response", and each of them carries its group in "g" and its name
+     * in "a".
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindArtifactsParsesSearchAnswer() throws Exception {
+        final HttpServer server = MavenCentralTest.serving(
+            String.join(
+                "",
+                "{\"responseHeader\":{\"status\":0,\"QTime\":1},",
+                "\"response\":{\"numFound\":2,\"start\":0,\"docs\":[",
+                "{\"id\":\"com.github.aistomin:jenkins-sdk\",",
+                "\"g\":\"com.github.aistomin\",\"a\":\"jenkins-sdk\",",
+                "\"latestVersion\":\"0.2.1\",\"p\":\"maven-plugin\",",
+                "\"timestamp\":1479480474000,\"versionCount\":5},",
+                "{\"id\":\"com.google.guava:guava\",",
+                "\"g\":\"com.google.guava\",\"a\":\"guava\",",
+                "\"latestVersion\":\"33.0.0\",\"p\":\"bundle\",",
+                "\"timestamp\":1700000000000,\"versionCount\":99}",
+                "]},\"spellcheck\":{\"suggestions\":[]}}"
+            )
+        );
+        try {
+            Assertions.assertEquals(
+                Arrays.asList(this.mine, this.guava),
+                MavenCentralTest.talkingTo(server).findArtifacts("whatever")
+            );
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    /**
+     * Check that a search answer which contains no documents at all gives an
+     * empty list rather than breaking the search. The answer is navigated
+     * field by field, so every one of those fields has to tolerate being
+     * absent.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindArtifactsParsesAnswerWithoutDocuments() throws Exception {
+        final HttpServer server = MavenCentralTest.serving(
+            "{\"responseHeader\":{\"status\":0}}"
+        );
+        try {
+            Assertions.assertTrue(
+                MavenCentralTest.talkingTo(server)
+                    .findArtifacts("whatever")
+                    .isEmpty()
+            );
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    /**
+     * Check that an answer which is not a valid JSON fails with
+     * {@link MvnException} rather than with an unchecked exception.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindArtifactsRejectsBrokenJson() throws Exception {
+        final HttpServer server = MavenCentralTest.serving("{\"response\":");
+        try {
+            final MvnRepo mvn = MavenCentralTest.talkingTo(server);
+            Assertions.assertInstanceOf(
+                JsonProcessingException.class,
+                Assertions.assertThrows(
+                    MvnException.class,
+                    () -> mvn.findArtifacts("whatever")
+                ).getCause()
+            );
+        } finally {
+            server.stop(0);
+        }
     }
 
     /**

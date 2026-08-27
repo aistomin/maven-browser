@@ -15,9 +15,6 @@
  */
 package com.github.aistomin.maven.browser;
 
-import java.util.Arrays;
-import org.json.simple.JSONObject;
-
 /**
  * Simple implementation of the Maven artifact's version entity.
  *
@@ -66,23 +63,6 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
         this.ver = version;
         this.type = packaging;
         this.release = timestamp;
-    }
-
-    /**
-     * Ctor.
-     *
-     * @param json JSON object.
-     */
-    public MavenArtifactVersion(final JSONObject json) {
-        this(
-            new MavenArtifact(json),
-            (String) json.get("v"),
-            Arrays.stream(MvnPackagingType.values())
-                .filter(
-                    item -> item.packaging().equals(json.get("p"))
-                ).findFirst().orElse(MvnPackagingType.JAR),
-            (Long) json.get("timestamp")
-        );
     }
 
     @Override

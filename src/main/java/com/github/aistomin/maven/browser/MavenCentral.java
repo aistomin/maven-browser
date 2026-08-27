@@ -15,6 +15,9 @@
  */
 package com.github.aistomin.maven.browser;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -35,10 +38,6 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.maven.artifact.versioning.ComparableVersion;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -87,6 +86,14 @@ public final class MavenCentral implements MvnRepo {
      */
     private static final String NO_DOCTYPE =
         "http://apache.org/xml/features/disallow-doctype-decl";
+
+    /**
+     * The JSON reader which we use to parse the search API's answers. It is
+     * shared because creating one is expensive and reading with it is
+     * thread-safe, as long as nobody reconfigures it afterwards. Nobody does:
+     * the field is private and the answers we read need no configuration.
+     */
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * The Maven repository base URL for fetching metadata.
@@ -173,14 +180,11 @@ public final class MavenCentral implements MvnRepo {
                 ),
                 HttpResponse.BodyHandlers.ofString(Charset.forName(ENCODING))
             );
-            return parseJsonResponse(result)
-                .stream()
-                .map(MavenArtifact::new)
-                .collect(Collectors.toList());
+            return parseSearchResponse(result);
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new MvnException(exception);
-        } catch (final ParseException | IOException exception) {
+        } catch (final IOException exception) {
             throw new MvnException(exception);
         }
     }
@@ -322,22 +326,33 @@ public final class MavenCentral implements MvnRepo {
     }
 
     /**
-     * Get the list of artifacts/versions from the Maven search API response.
+     * Read the artifacts out of the Maven search API's answer.
+     * The answer arrives over the network, so none of its structure is taken
+     * for granted: a missing field or a missing "docs" section yields an empty
+     * string or an empty list instead of an exception, which is why the nodes
+     * are navigated with {@code path} rather than with {@code get}.
      *
      * @param response Maven search API JSON response.
-     * @return The list of JSON objects.
-     * @throws ParseException If parsing wasn't successful.
+     * @return The list of the artifacts which the answer mentions.
+     * @throws JsonProcessingException If the answer is not a valid JSON.
      */
-    @SuppressWarnings("unchecked")
-    private static List<JSONObject> parseJsonResponse(
+    private static List<MvnArtifact> parseSearchResponse(
         final String response
-    ) throws ParseException {
-        return new ArrayList<JSONObject>(
-            (JSONArray) (
-                (JSONObject) ((JSONObject) new JSONParser().parse(response))
-                    .get("response")
-            ).get("docs")
-        );
+    ) throws JsonProcessingException {
+        final JsonNode docs = MAPPER
+            .readTree(response)
+            .path("response")
+            .path("docs");
+        final List<MvnArtifact> artifacts = new ArrayList<>(docs.size());
+        for (final JsonNode doc : docs) {
+            artifacts.add(
+                new MavenArtifact(
+                    new MavenGroup(doc.path("g").asText()),
+                    doc.path("a").asText()
+                )
+            );
+        }
+        return artifacts;
     }
 
     /**

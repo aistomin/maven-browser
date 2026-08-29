@@ -10,6 +10,19 @@
     <name>Maven Browser</name>
     <description>Java library which allows to search and browse the Maven artifacts.</description>
     <url>https://github.com/aistomin/maven-browser</url>
+    <!--
+        The year of first publication and the copyright holder. Apache's
+        license text carries these as the placeholders
+        "Copyright [yyyy] [name of copyright owner]", so they cannot come from
+        LICENSE and have to be stated once somewhere - here. The build fills
+        them into the license header of every .java file. The year is the year
+        of first publication: it is not a range and is never bumped.
+    -->
+    <inceptionYear>2019</inceptionYear>
+    <organization>
+        <name>Andrej Istomin</name>
+        <url>https://aistomin.com/</url>
+    </organization>
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
@@ -128,6 +141,92 @@
                     <source>21</source>
                     <target>21</target>
                 </configuration>
+            </plugin>
+            <!--
+                Derives the license header from LICENSE itself, so the notice
+                is never written down a second time.
+
+                LICENSE is the verbatim Apache 2.0 text. Its last 13 lines are
+                the "APPENDIX: How to apply the Apache License to your work"
+                boilerplate - Apache's own instruction for what every source
+                file should carry. Those lines, de-indented and with the
+                "Copyright [yyyy] [name of copyright owner]" placeholder
+                filled in from <inceptionYear> and <organization> above, are
+                exactly the header on every .java file.
+
+                This runs on every build and writes into target/, so the
+                extracted header cannot go stale: change LICENSE and the next
+                build compares the .java files against the new text.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>extract-license-header</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="${project.basedir}/LICENSE"
+                                      tofile="${project.build.directory}/license-header.txt"
+                                      overwrite="true">
+                                    <filterchain>
+                                        <tailfilter lines="13"/>
+                                        <tokenfilter>
+                                            <trim/>
+                                        </tokenfilter>
+                                        <replacestring
+                                            from="Copyright [yyyy] [name of copyright owner]"
+                                            to="Copyright (c) ${project.inceptionYear} ${project.organization.name}"/>
+                                    </filterchain>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+                Checks the header of every .java file against the notice
+                extracted from LICENSE above, and fails the build when a
+                header has drifted or is missing. Run
+                "mvn validate license:format" to rewrite the headers from
+                LICENSE; never edit a header by hand.
+
+                The check runs at process-sources rather than validate so the
+                extraction above has already happened, and so that
+                license:format is not blocked by the very check it exists to
+                satisfy.
+            -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>5.1.2</version>
+                <configuration>
+                    <licenseSets>
+                        <licenseSet>
+                            <header>${project.build.directory}/license-header.txt</header>
+                            <includes>
+                                <include>src/**/*.java</include>
+                            </includes>
+                        </licenseSet>
+                    </licenseSets>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                    </mapping>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-license-headers</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

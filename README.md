@@ -5,6 +5,7 @@
 [![codecov](https://codecov.io/gh/aistomin/maven-browser/branch/master/graph/badge.svg)](https://codecov.io/gh/aistomin/maven-browser)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.aistomin/maven-browser)](https://central.sonatype.com/artifact/com.github.aistomin/maven-browser)
 [![javadoc](https://javadoc.io/badge2/com.github.aistomin/maven-browser/javadoc.svg)](https://javadoc.io/doc/com.github.aistomin/maven-browser)
+[![license](https://img.shields.io/github/license/aistomin/maven-browser)](https://github.com/aistomin/maven-browser/blob/master/LICENSE)
 
 This Java library allows you to search and browse Maven Central. It uses the
 [Maven Central Search API](https://search.maven.org/classic/#api) for artifact

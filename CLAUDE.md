@@ -55,6 +55,10 @@ mvn test -Dtest=MavenCentralTest#methodName
 
 # Checkstyle alone (also runs automatically in the validate phase, so it fires on every build)
 mvn checkstyle:check
+
+# Rewrite the license header of every .java file from LICENSE. "validate" must
+# come first: that is the phase which extracts the header out of LICENSE.
+mvn validate license:format
 ```
 
 Notes on the build:
@@ -62,6 +66,33 @@ Notes on the build:
   violation. Rules are strict: mandatory Javadoc on all methods, fields, and types
   (including tests), line-length limits, naming rules, `final` parameters, etc. Match the
   existing files' Javadoc/comment style exactly or the build breaks before compiling.
+- **`LICENSE` is the only place the license text exists.** It is the verbatim 202-line
+  Apache 2.0 text from apache.org, which is what makes GitHub and license scanners detect
+  the project as `apache-2.0`. Never edit it, never reformat it, never trim it to the short
+  notice — that is what made this repo report `NOASSERTION` before.
+
+  The license header on every `.java` file is *derived* from it, not stored. `LICENSE`'s
+  last 13 lines are the "APPENDIX: How to apply the Apache License to your work" block;
+  `maven-antrun-plugin` extracts them at `validate`, de-indents them, fills the
+  `Copyright [yyyy] [name of copyright owner]` placeholder from `<inceptionYear>` and
+  `<organization>` in `pom.xml`, and writes `target/license-header.txt`.
+  `license-maven-plugin` then checks every `.java` header against it at `process-sources`
+  and **fails the build** on a drifted or missing header. Because the extraction reruns
+  every build, the two can never fall out of step: change `LICENSE` and the headers must be
+  regenerated or the build goes red.
+
+  So there are exactly three authored values — the Apache text in `LICENSE`, the year in
+  `<inceptionYear>`, the name in `<organization>` — and the notice itself is written nowhere.
+
+  It follows that you must never hand-edit a `.java` header (run `mvn validate
+  license:format`), and **never add a Checkstyle `Header`/`RegexpHeader` module or a
+  `conf/header.txt`-style template.** Those work by holding a second copy of the notice for
+  the first to be checked against; that copy is unchecked against `LICENSE` and will drift.
+
+  The year is fixed at **2019**, the year of first publication — never a range, never
+  bumped, and no automation to bump it. It carries no legal weight (copyright arises without
+  any notice under the Berne Convention), Apache's own boilerplate uses a single year, and a
+  constant notice is one that can never start failing on its own.
 - Javadoc runs at `package` (the `attach-javadocs` execution) with `-Xdoclint:all` and
   `failOnWarnings`, so a broken `{@link}`, a `@param` that does not match the signature or
   invalid HTML in a comment **fails the build** — Checkstyle checks that Javadoc exists,

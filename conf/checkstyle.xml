@@ -76,12 +76,13 @@
         <property name="message" value="Line has trailing spaces."/>
     </module>
 
-    <!-- Checks for Headers                                -->
-    <!-- See https://checkstyle.org/config_header.html   -->
-    <!-- <module name="Header"> -->
-    <!--   <property name="headerFile" value="${checkstyle.header.file}"/> -->
-    <!--   <property name="fileExtensions" value="java"/> -->
-    <!-- </module> -->
+    <!-- License headers are not checked here, and no Header or RegexpHeader  -->
+    <!-- module belongs in this file. Both compare a source file against a    -->
+    <!-- copy of the notice - inline here, or in a header template - and that -->
+    <!-- copy is a second place the text has to be maintained, with nothing   -->
+    <!-- checking it against LICENSE. The notice is instead extracted from    -->
+    <!-- LICENSE on every build and the headers are checked against that. See -->
+    <!-- the maven-antrun-plugin and license-maven-plugin setup in pom.xml.   -->
 
     <module name="TreeWalker">
 

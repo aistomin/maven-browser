@@ -63,6 +63,9 @@ public interface MvnRepo {
 
     /**
      * Search for the versions of the artifact.
+     * The range is clamped to the amount of the versions which the repository
+     * has, so {@code rows} may be {@link Integer#MAX_VALUE} to ask for
+     * everything starting from {@code start}.
      *
      * @param artifact The artifact.
      * @param start Indent of the search.
@@ -80,7 +83,8 @@ public interface MvnRepo {
      *
      * @param version The version.
      * @return The list of the newer versions.
-     * @throws MvnException If the problem occurred while reading from the repo.
+     * @throws MvnException If the problem occurred while reading from the repo,
+     *  or if the version is not found in the repository.
      */
     List<MvnArtifactVersion> findVersionsNewerThan(
         MvnArtifactVersion version
@@ -92,7 +96,8 @@ public interface MvnRepo {
      *
      * @param version The version.
      * @return The list of the older versions.
-     * @throws MvnException If the problem occurred while reading from the repo.
+     * @throws MvnException If the problem occurred while reading from the repo,
+     *  or if the version is not found in the repository.
      */
     List<MvnArtifactVersion> findVersionsOlderThan(
         MvnArtifactVersion version

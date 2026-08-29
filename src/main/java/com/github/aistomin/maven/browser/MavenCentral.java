@@ -218,7 +218,9 @@ public final class MavenCentral implements MvnRepo {
             final List<String> allVersions = parseMetadataXml(
                 this.get(url, HttpResponse.BodyHandlers.ofInputStream())
             );
-            final int endIndex = Math.min(start + rows, allVersions.size());
+            final int endIndex = (int) Math.min(
+                (long) start + rows, allVersions.size()
+            );
             final List<String> pagedVersions =
                 start < allVersions.size()
                     ? allVersions.subList(start, endIndex)
@@ -311,7 +313,7 @@ public final class MavenCentral implements MvnRepo {
             .findFirst()
             .orElse(null);
         if (loaded == null) {
-            throw new IllegalStateException(
+            throw new MvnException(
                 String.format(
                     "%s %s was not found in Maven Central.",
                     current.artifact().name(),

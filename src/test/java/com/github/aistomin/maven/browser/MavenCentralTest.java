@@ -325,6 +325,26 @@ final class MavenCentralTest {
     }
 
     /**
+     * Check that asking for everything from a non-zero start works. The amount
+     * of the rows is not added to the start index in {@code int} arithmetic,
+     * so {@link Integer#MAX_VALUE} rows do not overflow into a negative end
+     * index.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsWithMaxRows() throws Exception {
+        final List<MvnArtifactVersion> versions = new MavenCentral()
+            .findVersions(this.mine, 1, Integer.MAX_VALUE);
+        Assertions.assertEquals(this.vers.size() - 1, versions.size());
+        Assertions.assertEquals(this.vers.get(1), versions.get(0).name());
+        Assertions.assertEquals(
+            this.vers.get(this.vers.size() - 1),
+            versions.get(versions.size() - 1).name()
+        );
+    }
+
+    /**
      * Check that we correctly find the versions which are newer than provided
      * one.
      *
@@ -334,7 +354,7 @@ final class MavenCentralTest {
     void testFindVersionsNewerThan() throws Exception {
         final MvnRepo mvn = new MavenCentral();
         Assertions.assertThrows(
-            IllegalStateException.class,
+            MvnException.class,
             () -> {
                 mvn.findVersionsNewerThan(
                     new MavenArtifactVersion(
@@ -370,9 +390,9 @@ final class MavenCentralTest {
     void testFindVersionsOlderThan() throws Exception {
         final MvnRepo mvn = new MavenCentral();
         Assertions.assertThrows(
-            IllegalStateException.class,
+            MvnException.class,
             () -> {
-                mvn.findVersionsNewerThan(
+                mvn.findVersionsOlderThan(
                     new MavenArtifactVersion(
                         this.mine,
                         "wrong-version",

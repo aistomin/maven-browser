@@ -98,7 +98,7 @@ Notes on the build:
   invalid HTML in a comment **fails the build** — Checkstyle checks that Javadoc exists,
   doclint checks that it is correct.
 - PMD, duplicate-finder, and `maven-dependencies-analyser` run at `verify`.
-- JaCoCo enforces **90% line coverage per package** (`jacoco:check`); new code needs tests.
+- JaCoCo enforces **95% line coverage per package** (`jacoco:check`); new code needs tests.
 - Tests are JUnit 5 (Jupiter). `MavenCentralTest` hits the real Maven Central network APIs,
   so the full build needs network access.
 
@@ -262,7 +262,7 @@ to push.
 
    It needs JDK 21 and network access (`MavenCentralTest` calls the real Maven Central
    APIs); mention in the proposal if either is missing. Remember the build gates: strict
-   Checkstyle at `validate`, PMD at `verify`, and JaCoCo's 90% line coverage per package —
+   Checkstyle at `validate`, PMD at `verify`, and JaCoCo's 95% line coverage per package —
    new code without tests fails the build.
 
    Once implemented: run the full build and report the real result.

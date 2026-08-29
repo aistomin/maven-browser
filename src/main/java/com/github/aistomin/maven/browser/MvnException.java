@@ -30,4 +30,13 @@ public final class MvnException extends Exception {
     public MvnException(final Throwable cause) {
         super(cause);
     }
+
+    /**
+     * Ctor.
+     *
+     * @param message The error message.
+     */
+    public MvnException(final String message) {
+        super(message);
+    }
 }

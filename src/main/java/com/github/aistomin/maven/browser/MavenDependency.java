@@ -84,7 +84,7 @@ public final class MavenDependency implements MvnDependency {
     public String forGradle() {
         final MvnArtifact artifact = this.ver.artifact();
         return String.format(
-            "compile '%s:%s:%s'",
+            "implementation '%s:%s:%s'",
             artifact.group().name(),
             artifact.name(),
             this.ver.name()

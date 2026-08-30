@@ -42,6 +42,20 @@ browsing Maven Central. It is published to Maven Central as
 
 ## Commands
 
+**Every `mvn` command below needs `JAVA_HOME` pointed at JDK 21 first.** This machine's
+default JDK is 8, because most other projects on it still need 8, so a bare `mvn` dies
+with `Unrecognized option: --add-opens` / `Could not create the Java Virtual Machine`
+before it does anything. That is an environment problem, never a problem with the change
+being built. The JDKs are managed by sdkman:
+
+```bash
+# Prefix every Maven invocation (do not rely on `current` — it points at 8)
+JAVA_HOME=~/.sdkman/candidates/java/21.0.5-tem mvn clean install
+
+# If that exact build is gone, see which 21 is installed
+ls ~/.sdkman/candidates/java/
+```
+
 ```bash
 # Full build — run this before submitting any PR (per README contribution guidelines)
 mvn clean install
@@ -99,8 +113,13 @@ Notes on the build:
   doclint checks that it is correct.
 - PMD, duplicate-finder, and `maven-dependencies-analyser` run at `verify`.
 - JaCoCo enforces **95% line coverage per package** (`jacoco:check`); new code needs tests.
-- Tests are JUnit 5 (Jupiter). `MavenCentralTest` hits the real Maven Central network APIs,
-  so the full build needs network access.
+- Tests are JUnit 5 (Jupiter). Almost all of `MavenCentralTest` reads from
+  `FakeMavenCentral`, a localhost HTTP server which serves the fixtures in
+  `src/test/resources/fixtures`, so the assertions do not depend on what Maven Central
+  happens to contain today. Two tests — the ones whose names end with `InMavenCentral` —
+  deliberately call the real APIs, so the full build still needs network access. They
+  assert loosely (non-empty, `contains`, `<=`) and must never assert an exact count of
+  live data.
 
 ## Architecture
 
@@ -260,10 +279,11 @@ to push.
    mvn clean install
    ```
 
-   It needs JDK 21 and network access (`MavenCentralTest` calls the real Maven Central
-   APIs); mention in the proposal if either is missing. Remember the build gates: strict
-   Checkstyle at `validate`, PMD at `verify`, and JaCoCo's 95% line coverage per package —
-   new code without tests fails the build.
+   It needs the JDK 21 `JAVA_HOME` prefix from the Commands section above (the machine
+   defaults to JDK 8) and network access (`MavenCentralTest`'s two `*InMavenCentral`
+   tests call the real Maven Central APIs); mention in the proposal if either is missing.
+   Remember the build gates: strict Checkstyle at `validate`, PMD at `verify`, and
+   JaCoCo's 95% line coverage per package — new code without tests fails the build.
 
    Once implemented: run the full build and report the real result.
 

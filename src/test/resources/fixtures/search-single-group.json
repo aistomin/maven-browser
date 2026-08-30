@@ -1,0 +1,100 @@
+{
+  "responseHeader": {
+    "status": 0,
+    "QTime": 1,
+    "params": {
+      "q": "g:\"com.github.aistomin\"",
+      "core": "",
+      "indent": "off",
+      "spellcheck": "true",
+      "fl": "id,g,a,latestVersion,p,ec,repositoryId,text,timestamp,versionCount",
+      "start": "0",
+      "spellcheck.count": "5",
+      "sort": "score desc,timestamp desc,g asc,a asc",
+      "rows": "20",
+      "wt": "json",
+      "version": "2.2"
+    }
+  },
+  "response": {
+    "numFound": 5,
+    "start": 0,
+    "docs": [
+      {
+        "id": "com.github.aistomin:testist",
+        "g": "com.github.aistomin",
+        "a": "testist",
+        "latestVersion": "1.0",
+        "repositoryId": "central",
+        "p": "jar",
+        "timestamp": 1703508004270,
+        "versionCount": 6,
+        "text": [
+          "com.github.aistomin",
+          "testist",
+          "-sources.jar",
+          ".pom",
+          "-javadoc.jar",
+          ".jar"
+        ],
+        "ec": [
+          "-sources.jar",
+          ".pom",
+          "-javadoc.jar",
+          ".jar"
+        ]
+      },
+      {
+        "id": "com.github.aistomin:maven-browser",
+        "g": "com.github.aistomin",
+        "a": "maven-browser",
+        "latestVersion": "4.0",
+        "repositoryId": "central",
+        "p": "jar",
+        "timestamp": 1700810125858,
+        "versionCount": 15,
+        "text": [
+          "com.github.aistomin",
+          "maven-browser",
+          "-sources.jar",
+          ".pom",
+          "-javadoc.jar",
+          ".jar"
+        ],
+        "ec": [
+          "-sources.jar",
+          ".pom",
+          "-javadoc.jar",
+          ".jar"
+        ]
+      },
+      {
+        "id": "com.github.aistomin:jenkins-sdk",
+        "g": "com.github.aistomin",
+        "a": "jenkins-sdk",
+        "latestVersion": "0.2.1",
+        "repositoryId": "central",
+        "p": "jar",
+        "timestamp": 1479480474000,
+        "versionCount": 5,
+        "text": [
+          "com.github.aistomin",
+          "jenkins-sdk",
+          "-sources.jar",
+          "-javadoc.jar",
+          ".jar",
+          ".pom"
+        ],
+        "ec": [
+          "-sources.jar",
+          "-javadoc.jar",
+          ".jar",
+          ".pom"
+        ]
+      }
+    ]
+  },
+  "spellcheck": {
+    "suggestions": []
+  }
+}

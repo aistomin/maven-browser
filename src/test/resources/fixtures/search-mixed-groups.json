@@ -1,0 +1,114 @@
+{
+  "responseHeader": {
+    "status": 0,
+    "QTime": 1,
+    "params": {
+      "q": "guice",
+      "core": "",
+      "defType": "dismax",
+      "qf": "text^20 g^5 a^10",
+      "indent": "off",
+      "spellcheck": "true",
+      "fl": "id,g,a,latestVersion,p,ec,repositoryId,text,timestamp,versionCount",
+      "start": "0",
+      "spellcheck.count": "5",
+      "sort": "score desc,timestamp desc,g asc,a asc",
+      "rows": "20",
+      "wt": "json",
+      "version": "2.2"
+    }
+  },
+  "response": {
+    "numFound": 979,
+    "start": 0,
+    "docs": [
+      {
+        "id": "org.openidentityplatform.commons:guice",
+        "g": "org.openidentityplatform.commons",
+        "a": "guice",
+        "latestVersion": "2.3.0",
+        "repositoryId": "central",
+        "p": "pom",
+        "timestamp": 1750337779639,
+        "versionCount": 24,
+        "text": [
+          "org.openidentityplatform.commons",
+          "guice",
+          ".pom"
+        ],
+        "ec": [
+          ".pom"
+        ]
+      },
+      {
+        "id": "io.github.replay-framework:guice",
+        "g": "io.github.replay-framework",
+        "a": "guice",
+        "latestVersion": "2.6.3",
+        "repositoryId": "central",
+        "p": "jar",
+        "timestamp": 1727896323000,
+        "versionCount": 7,
+        "text": [
+          "io.github.replay-framework",
+          "guice",
+          "-sources.jar.sha256",
+          "-javadoc.jar",
+          "-javadoc.jar.sha512",
+          ".jar.asc.sha256",
+          ".module.asc.sha256",
+          ".module.asc.sha512",
+          "-javadoc.jar.sha256",
+          ".jar.asc.sha512",
+          "-sources.jar.asc.sha512",
+          ".module",
+          ".pom.sha512",
+          "-sources.jar",
+          ".module.sha256",
+          ".pom",
+          "-sources.jar.asc.sha256",
+          ".module.sha512",
+          "-javadoc.jar.asc.sha256",
+          "-javadoc.jar.asc.sha512",
+          ".jar",
+          ".pom.asc.sha256",
+          ".pom.asc.sha512",
+          ".jar.sha512",
+          ".pom.sha256",
+          "-sources.jar.sha512",
+          ".jar.sha256"
+        ],
+        "ec": [
+          "-sources.jar.sha256",
+          "-javadoc.jar",
+          "-javadoc.jar.sha512",
+          ".jar.asc.sha256",
+          ".module.asc.sha256",
+          ".module.asc.sha512",
+          "-javadoc.jar.sha256",
+          ".jar.asc.sha512",
+          "-sources.jar.asc.sha512",
+          ".module",
+          ".pom.sha512",
+          "-sources.jar",
+          ".module.sha256",
+          ".pom",
+          "-sources.jar.asc.sha256",
+          ".module.sha512",
+          "-javadoc.jar.asc.sha256",
+          "-javadoc.jar.asc.sha512",
+          ".jar",
+          ".pom.asc.sha256",
+          ".pom.asc.sha512",
+          ".jar.sha512",
+          ".pom.sha256",
+          "-sources.jar.sha512",
+          ".jar.sha256"
+        ]
+      }
+    ]
+  },
+  "spellcheck": {
+    "suggestions": []
+  }
+}

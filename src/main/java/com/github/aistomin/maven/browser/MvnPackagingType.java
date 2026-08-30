@@ -16,7 +16,9 @@
 package com.github.aistomin.maven.browser;
 
 /**
- * The packaging types which a Maven artifact's version can have.
+ * The packaging types which a Maven artifact's version can have, plus
+ * {@link MvnPackagingType#UNKNOWN} for the versions whose packaging the
+ * repository did not tell us.
  *
  * @since 1.0
  */
@@ -60,7 +62,14 @@ public enum MvnPackagingType {
     /**
      * Packaging type "par".
      */
-    PAR("par");
+    PAR("par"),
+
+    /**
+     * The packaging type is not known. The repository did not tell us which
+     * one it is, which is what every version read out of maven-metadata.xml
+     * looks like: that file carries no per-version packaging at all.
+     */
+    UNKNOWN("unknown");
 
     /**
      * Packaging type as it appears in pom.xml.

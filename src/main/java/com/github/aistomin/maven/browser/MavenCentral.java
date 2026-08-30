@@ -48,6 +48,12 @@ import org.xml.sax.SAXException;
  * fetching artifact metadata (stable).
  * Uses <a href="https://search.maven.org/">search.maven.org</a> for artifact
  * search functionality.
+ * The version listing comes from maven-metadata.xml, which holds the version
+ * names and nothing else. The versions it returns therefore say
+ * {@link MvnPackagingType#UNKNOWN} and have no release timestamp rather than
+ * claiming a packaging and a date which the repository never told us - a BOM
+ * or a Maven plugin is not a jar, and pretending otherwise was wrong for
+ * every artifact which is not one.
  *
  * @since 0.1
  */
@@ -228,7 +234,7 @@ public final class MavenCentral implements MvnRepo {
             return pagedVersions.stream()
                 .map(
                     ver -> new MavenArtifactVersion(
-                        artifact, ver, MvnPackagingType.JAR, null
+                        artifact, ver, MvnPackagingType.UNKNOWN, null
                     )
                 )
                 .collect(Collectors.toList());

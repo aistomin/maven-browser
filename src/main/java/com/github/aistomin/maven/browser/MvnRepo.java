@@ -52,6 +52,10 @@ public interface MvnRepo {
 
     /**
      * Search for the versions of the artifact. Returns first 20 found versions.
+     * A repository which lists the versions out of maven-metadata.xml learns
+     * nothing but their names from it, so the versions come back with
+     * {@link MvnPackagingType#UNKNOWN} packaging and an empty release
+     * timestamp.
      *
      * @param artifact The artifact.
      * @return The list of the found versions of the artifact.
@@ -66,6 +70,8 @@ public interface MvnRepo {
      * The range is clamped to the amount of the versions which the repository
      * has, so {@code rows} may be {@link Integer#MAX_VALUE} to ask for
      * everything starting from {@code start}.
+     * The versions carry as much as the repository told us about them - see
+     * {@link #findVersions(MvnArtifact)}.
      *
      * @param artifact The artifact.
      * @param start Indent of the search.
@@ -79,7 +85,8 @@ public interface MvnRepo {
 
     /**
      * Search for all the versions of the artifact which are newer than provided
-     * version.
+     * version. The versions carry as much as the repository told us about
+     * them - see {@link #findVersions(MvnArtifact)}.
      *
      * @param version The version.
      * @return The list of the newer versions.
@@ -92,7 +99,8 @@ public interface MvnRepo {
 
     /**
      * Search for all the versions of the artifact which are older than provided
-     * version.
+     * version. The versions carry as much as the repository told us about
+     * them - see {@link #findVersions(MvnArtifact)}.
      *
      * @param version The version.
      * @return The list of the older versions.

@@ -75,6 +75,12 @@ final class MavenCentralTest {
         "guava-maven-metadata.xml";
 
     /**
+     * The name of the fixture with the metadata of the JUnit BOM.
+     */
+    private static final String BOM_METADATA =
+        "junit-bom-maven-metadata.xml";
+
+    /**
      * My previously created artifact which we can use for tests.
      */
     private final MvnArtifact mine = new MavenArtifact(
@@ -88,6 +94,14 @@ final class MavenCentralTest {
      */
     private final MvnArtifact guava = new MavenArtifact(
         new MavenGroup("com.google.guava"), "guava"
+    );
+
+    /**
+     * The JUnit BOM. Its packaging is "pom", not "jar", which is what makes it
+     * the artifact to check that we do not fabricate a packaging.
+     */
+    private final MvnArtifact bom = new MavenArtifact(
+        new MavenGroup("org.junit"), "junit-bom"
     );
 
     /**
@@ -423,6 +437,30 @@ final class MavenCentralTest {
     }
 
     /**
+     * Check that the versions we read out of maven-metadata.xml admit what
+     * that file does not say. It carries the version names and nothing else,
+     * so claiming a packaging or a release date would be making it up. The
+     * artifact here is a BOM, whose packaging is "pom": before, every one of
+     * its versions came back calling itself a jar.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsDoesNotFabricateMetadata() throws Exception {
+        try (FakeMavenCentral fake = this.serving()) {
+            final List<MvnArtifactVersion> versions =
+                fake.browser().findVersions(this.bom);
+            Assertions.assertFalse(versions.isEmpty());
+            for (final MvnArtifactVersion ver : versions) {
+                Assertions.assertEquals(
+                    MvnPackagingType.UNKNOWN, ver.packaging()
+                );
+                Assertions.assertTrue(ver.releaseTimestamp().isEmpty());
+            }
+        }
+    }
+
+    /**
      * Check that we correctly find the versions which are newer than provided
      * one.
      *
@@ -731,6 +769,10 @@ final class MavenCentralTest {
             .withMetadata(
                 this.guava,
                 FakeMavenCentral.fixture(MavenCentralTest.GUAVA_METADATA)
+            )
+            .withMetadata(
+                this.bom,
+                FakeMavenCentral.fixture(MavenCentralTest.BOM_METADATA)
             );
     }
 

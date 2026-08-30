@@ -31,7 +31,7 @@ If you use Maven, add the following configuration to your project's `pom.xml`:
     <dependency>
         <groupId>com.github.aistomin</groupId>
         <artifactId>maven-browser</artifactId>
-        <version>5.1</version>
+        <version>5.2</version>
     </dependency>
     <!-- other dependencies -->
 </dependencies>
@@ -40,7 +40,7 @@ If you use Maven, add the following configuration to your project's `pom.xml`:
 or, if you use Gradle, add the following line to your build file:
 
 ```gradle
-implementation 'com.github.aistomin:maven-browser:5.1'
+implementation 'com.github.aistomin:maven-browser:5.2'
 ```
 
 ### Read Data from Maven Central

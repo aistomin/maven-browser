@@ -15,6 +15,8 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.Optional;
+
 /**
  * Simple implementation of the Maven artifact's version entity.
  *
@@ -52,8 +54,11 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
      *
      * @param artifact Maven artifact.
      * @param version Maven artifact version.
-     * @param packaging Maven packaging type.
-     * @param timestamp The timestamp when the version was released.
+     * @param packaging Maven packaging type. Pass
+     *  {@link MvnPackagingType#UNKNOWN} if you do not know it.
+     * @param timestamp The timestamp when the version was released. NULL if
+     *  you do not know it, which {@link #releaseTimestamp()} gives back as an
+     *  empty {@link Optional}.
      */
     public MavenArtifactVersion(
         final MvnArtifact artifact, final String version,
@@ -76,8 +81,8 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     }
 
     @Override
-    public Long releaseTimestamp() {
-        return this.release;
+    public Optional<Long> releaseTimestamp() {
+        return Optional.ofNullable(this.release);
     }
 
     @Override

@@ -15,8 +15,15 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.Optional;
+
 /**
  * The interface of classes which represent the Maven artifact's version.
+ * Not every repository knows everything about a version: the packaging and
+ * the release timestamp are only available from the search API, so a version
+ * which was read out of maven-metadata.xml says so instead of pretending -
+ * see {@link MvnArtifactVersion#packaging()} and
+ * {@link MvnArtifactVersion#releaseTimestamp()}.
  *
  * @since 0.1
  */
@@ -39,9 +46,12 @@ public interface MvnArtifactVersion {
     /**
      * The timestamp when the version was released.
      *
-     * @return The timestamp.
+     * @return The timestamp, or an empty {@link Optional} if the repository
+     *  did not tell us when the version was released. The versions which
+     *  {@link MvnRepo#findVersions(MvnArtifact)} returns are always empty
+     *  here: maven-metadata.xml carries no per-version timestamp.
      */
-    Long releaseTimestamp();
+    Optional<Long> releaseTimestamp();
 
     /**
      * Artifact's version identifier. Normally it looks like
@@ -61,7 +71,10 @@ public interface MvnArtifactVersion {
     /**
      * Artifact's packaging.
      *
-     * @return Packaging type.
+     * @return Packaging type, or {@link MvnPackagingType#UNKNOWN} if the
+     *  repository did not tell us which one it is. The versions which
+     *  {@link MvnRepo#findVersions(MvnArtifact)} returns are always UNKNOWN
+     *  here: maven-metadata.xml carries no per-version packaging.
      */
     MvnPackagingType packaging();
 }

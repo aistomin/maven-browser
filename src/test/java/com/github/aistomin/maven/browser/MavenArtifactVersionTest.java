@@ -17,7 +17,7 @@ package com.github.aistomin.maven.browser;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
@@ -54,7 +54,8 @@ final class MavenArtifactVersionTest {
         Assertions.assertEquals(artifact, version.artifact());
         Assertions.assertEquals(type, version.packaging());
         Assertions.assertEquals(
-            MavenArtifactVersionTest.TIMESTAMP, version.releaseTimestamp()
+            Optional.of(MavenArtifactVersionTest.TIMESTAMP),
+            version.releaseTimestamp()
         );
         Assertions.assertEquals(
             String.format("%s:%s", artifact.identifier(), name),
@@ -106,24 +107,23 @@ final class MavenArtifactVersionTest {
     }
 
     /**
-     * Check that we properly assign and return the packaging of the artifact.
-     * Note: When using repo1.maven.org (maven-metadata.xml), packaging info
-     * is not available and defaults to JAR. This test verifies that behavior.
-     * The packaging which is passed to the ctor is checked in testConstruct().
+     * Check that a version which was built without a release timestamp says
+     * so, instead of handing out a NULL which the caller unboxes into an NPE.
+     * That is how every version read out of maven-metadata.xml is built - see
+     * {@link MavenCentralTest#testFindVersionsDoesNotFabricateMetadata()}.
      */
     @Test
-    void testPackaging() throws Exception {
-        final List<MvnArtifactVersion> versions =
-            new MavenCentral().findVersions(
+    void testUnknownReleaseTimestamp() {
+        Assertions.assertTrue(
+            new MavenArtifactVersion(
                 new MavenArtifact(
-                    new MavenGroup("org.apache.maven.plugins"),
-                    "maven-plugin-plugin"
-                )
-            );
-        for (final MvnArtifactVersion version : versions) {
-            Assertions.assertEquals(
-                MvnPackagingType.JAR, version.packaging()
-            );
-        }
+                    new MavenGroup(UUID.randomUUID().toString()),
+                    UUID.randomUUID().toString()
+                ),
+                UUID.randomUUID().toString(),
+                MvnPackagingType.UNKNOWN,
+                null
+            ).releaseTimestamp().isEmpty()
+        );
     }
 }

@@ -52,7 +52,8 @@ public interface MvnDependency {
     String forGroovyGrape();
 
     /**
-     * Converts the dependency to Gradle/Grails dependency string.
+     * Converts the dependency to Gradle/Grails dependency string. The
+     * dependency is rendered with the {@code implementation} configuration.
      *
      * @return Gradle/Grails dependency string.
      */

@@ -41,7 +41,7 @@ final class MavenDependencyTest {
     @Test
     void testForGradle() throws Exception {
         Assertions.assertEquals(
-            "compile 'com.github.aistomin:jenkins-sdk:0.2.1'",
+            "implementation 'com.github.aistomin:jenkins-sdk:0.2.1'",
             this.dependency().forGradle()
         );
     }

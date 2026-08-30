@@ -16,7 +16,7 @@
 package com.github.aistomin.maven.browser;
 
 /**
- * The interface of classes which represent the Maven artifacts' group.
+ * The packaging types which a Maven artifact's version can have.
  *
  * @since 1.0
  */

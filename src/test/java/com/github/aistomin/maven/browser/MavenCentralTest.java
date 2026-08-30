@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.xml.sax.SAXParseException;
@@ -52,11 +51,6 @@ final class MavenCentralTest {
      * Five.
      */
     private static final int FIVE = 5;
-
-    /**
-     * Ten.
-     */
-    private static final int TEN = 10;
 
     /**
      * My previously created artifact which we can use for tests.
@@ -124,12 +118,7 @@ final class MavenCentralTest {
         );
         final List<MvnArtifact> found = mvn.findArtifacts("aistomin");
         Assertions.assertEquals(MavenCentralTest.FIVE, found.size());
-        Assertions.assertNotNull(
-            found.stream()
-                .filter(artifact -> artifact.equals(this.mine))
-                .findFirst()
-                .get()
-        );
+        Assertions.assertTrue(found.contains(this.mine));
     }
 
     /**

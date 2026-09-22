@@ -36,13 +36,13 @@ sort it out afterwards — a public push cannot be taken back.
 
 ## Project
 
-`maven-browser` is a small Java library (single Maven module, JDK 21) for searching and
+`maven-browser` is a small Java library (single Maven module, JDK 25) for searching and
 browsing Maven Central. It is published to Maven Central as
 `com.github.aistomin:maven-browser`.
 
 ## Commands
 
-**Every `mvn` command below needs `JAVA_HOME` pointed at JDK 21 first.** This machine's
+**Every `mvn` command below needs `JAVA_HOME` pointed at JDK 25 first.** This machine's
 default JDK is 8, because most other projects on it still need 8, so a bare `mvn` dies
 with `Unrecognized option: --add-opens` / `Could not create the Java Virtual Machine`
 before it does anything. That is an environment problem, never a problem with the change
@@ -50,9 +50,9 @@ being built. The JDKs are managed by sdkman:
 
 ```bash
 # Prefix every Maven invocation (do not rely on `current` — it points at 8)
-JAVA_HOME=~/.sdkman/candidates/java/21.0.5-tem mvn clean install
+JAVA_HOME=~/.sdkman/candidates/java/25.0.4-tem mvn clean install
 
-# If that exact build is gone, see which 21 is installed
+# If that exact build is gone, see which 25 is installed
 ls ~/.sdkman/candidates/java/
 ```
 
@@ -279,7 +279,7 @@ to push.
    mvn clean install
    ```
 
-   It needs the JDK 21 `JAVA_HOME` prefix from the Commands section above (the machine
+   It needs the JDK 25 `JAVA_HOME` prefix from the Commands section above (the machine
    defaults to JDK 8) and network access (`MavenCentralTest`'s two `*InMavenCentral`
    tests call the real Maven Central APIs); mention in the proposal if either is missing.
    Remember the build gates: strict Checkstyle at `validate`, PMD at `verify`, and

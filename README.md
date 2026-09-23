@@ -19,7 +19,7 @@ scripts or other tools that need to read information from Maven Central.
 ### System Requirements
 
 - JDK 25 or higher.
-- Apache Maven 3.3.9 or higher.
+- Apache Maven 3.8.3 or higher.
 
 ### Add Maven Dependency
 

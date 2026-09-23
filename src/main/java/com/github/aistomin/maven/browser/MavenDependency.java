@@ -27,12 +27,14 @@ public record MavenDependency(MvnArtifactVersion version)
     @Override
     public String forMaven() {
         final MvnArtifact artifact = this.version.artifact();
-        return String.format(
-            "<dependency>%n%s%n%s%n%s%n</dependency>",
-            String.format("  <groupId>%s</groupId>", artifact.group().name()),
-            String.format("  <artifactId>%s</artifactId>", artifact.name()),
-            String.format("  <version>%s</version>", this.version.name())
-        );
+        return """
+            <dependency>
+              <groupId>%s</groupId>
+              <artifactId>%s</artifactId>
+              <version>%s</version>
+            </dependency>""".formatted(
+                artifact.group().name(), artifact.name(), this.version.name()
+            );
     }
 
     @Override
@@ -60,12 +62,12 @@ public record MavenDependency(MvnArtifactVersion version)
     @Override
     public String forGroovyGrape() {
         final MvnArtifact artifact = this.version.artifact();
-        return String.format(
-            "@Grapes(%n  @Grab(group='%s', module='%s', version='%s')%n)",
-            artifact.group().name(),
-            artifact.name(),
-            this.version.name()
-        );
+        return """
+            @Grapes(
+              @Grab(group='%s', module='%s', version='%s')
+            )""".formatted(
+                artifact.group().name(), artifact.name(), this.version.name()
+            );
     }
 
     @Override

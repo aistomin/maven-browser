@@ -18,44 +18,13 @@ package com.github.aistomin.maven.browser;
 /**
  * Simple implementation of the Maven group entity.
  *
+ * @param name The Maven group's name.
  * @since 0.1
  */
-public final class MavenGroup implements MvnGroup {
-
-    /**
-     * The Maven group's name.
-     */
-    private final String group;
-
-    /**
-     * Ctor.
-     *
-     * @param name The Maven group's name.
-     */
-    public MavenGroup(final String name) {
-        this.group = name;
-    }
-
-    @Override
-    public String name() {
-        return this.group;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        return this == obj
-            || obj != null
-            && getClass() == obj.getClass()
-            && this.group.equals(((MavenGroup) obj).group);
-    }
-
-    @Override
-    public int hashCode() {
-        return this.group.hashCode();
-    }
+public record MavenGroup(String name) implements MvnGroup {
 
     @Override
     public String toString() {
-        return this.group;
+        return this.name;
     }
 }

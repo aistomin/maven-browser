@@ -105,10 +105,9 @@ public final class MavenArtifactVersion implements MvnArtifactVersion {
     @Override
     public boolean equals(final Object obj) {
         return this == obj
-            || obj != null
-            && getClass() == obj.getClass()
-            && this.art.equals(((MavenArtifactVersion) obj).art)
-            && this.ver.equals(((MavenArtifactVersion) obj).ver);
+            || obj instanceof MavenArtifactVersion other
+            && this.art.equals(other.art)
+            && this.ver.equals(other.ver);
     }
 
     @Override

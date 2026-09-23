@@ -88,6 +88,47 @@ final class MavenArtifactVersionTest {
     }
 
     /**
+     * Check that a version equals only itself or a version of the same
+     * artifact with the same name, and never NULL or an object of another
+     * type.
+     */
+    @Test
+    void testNotEquals() {
+        final MvnArtifact artifact = new MavenArtifact(
+            new MavenGroup(UUID.randomUUID().toString()),
+            UUID.randomUUID().toString()
+        );
+        final String name = UUID.randomUUID().toString();
+        final MvnArtifactVersion version = new MavenArtifactVersion(
+            artifact, name, MvnPackagingType.JAR, System.currentTimeMillis()
+        );
+        Assertions.assertEquals(version, version);
+        Assertions.assertNotEquals(version, null);
+        Assertions.assertNotEquals(version, version.identifier());
+        Assertions.assertNotEquals(
+            version,
+            new MavenArtifactVersion(
+                artifact,
+                UUID.randomUUID().toString(),
+                MvnPackagingType.JAR,
+                System.currentTimeMillis()
+            )
+        );
+        Assertions.assertNotEquals(
+            version,
+            new MavenArtifactVersion(
+                new MavenArtifact(
+                    new MavenGroup(UUID.randomUUID().toString()),
+                    UUID.randomUUID().toString()
+                ),
+                name,
+                MvnPackagingType.JAR,
+                System.currentTimeMillis()
+            )
+        );
+    }
+
+    /**
      * Check that we properly convert the entity to string.
      */
     @Test

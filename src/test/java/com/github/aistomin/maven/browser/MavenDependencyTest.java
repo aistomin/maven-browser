@@ -71,11 +71,13 @@ final class MavenDependencyTest {
     @Test
     void testForMaven() throws Exception {
         Assertions.assertEquals(
-            String.format(
-                "<dependency>%n%s%n%s%n%s%n</dependency>",
+            String.join(
+                "\n",
+                "<dependency>",
                 "  <groupId>com.github.aistomin</groupId>",
                 "  <artifactId>jenkins-sdk</artifactId>",
-                "  <version>0.2.1</version>"
+                "  <version>0.2.1</version>",
+                "</dependency>"
             ), this.dependency().forMaven()
         );
     }
@@ -106,9 +108,14 @@ final class MavenDependencyTest {
     @Test
     void testForGroovyGrape() throws Exception {
         Assertions.assertEquals(
-            String.format(
-                "@Grapes(\n  @Grab(group=%s, module=%s, version=%s)\n)",
-                "'com.github.aistomin'", "'jenkins-sdk'", "'0.2.1'"
+            String.join(
+                "\n",
+                "@Grapes(",
+                String.format(
+                    "  @Grab(group=%s, module=%s, version=%s)",
+                    "'com.github.aistomin'", "'jenkins-sdk'", "'0.2.1'"
+                ),
+                ")"
             ),
             this.dependency().forGroovyGrape()
         );

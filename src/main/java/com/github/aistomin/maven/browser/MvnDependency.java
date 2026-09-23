@@ -24,7 +24,9 @@ package com.github.aistomin.maven.browser;
 public interface MvnDependency {
 
     /**
-     * Converts the dependency to Apache Maven dependency string.
+     * Converts the dependency to Apache Maven dependency string. The snippet
+     * spans several lines, separated by {@code \n} regardless of the
+     * platform.
      *
      * @return Apache Maven dependency string.
      */
@@ -45,7 +47,9 @@ public interface MvnDependency {
     String forIvy();
 
     /**
-     * Converts the dependency to Groovy Grape dependency string.
+     * Converts the dependency to Groovy Grape dependency string. The snippet
+     * spans several lines, separated by {@code \n} regardless of the
+     * platform.
      *
      * @return Groovy Grape dependency string.
      */

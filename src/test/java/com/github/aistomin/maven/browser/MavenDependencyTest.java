@@ -15,6 +15,8 @@
  */
 package com.github.aistomin.maven.browser;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -141,6 +143,27 @@ final class MavenDependencyTest {
         Assertions.assertEquals(
             "[com.github.aistomin/jenkins-sdk \"0.2.1\"]",
             this.dependency().forLeiningen()
+        );
+    }
+
+    /**
+     * Check that dependencies of equal versions are equal.
+     */
+    @Test
+    void testEqualsAndHashCode() {
+        final MvnDependency first = new MavenDependency(
+            new MavenArtifactVersion(
+                this.mine, "0.2.1", MvnPackagingType.JAR, null
+            )
+        );
+        final MvnDependency second = new MavenDependency(
+            new MavenArtifactVersion(
+                this.mine, "0.2.1", MvnPackagingType.JAR, null
+            )
+        );
+        Assertions.assertEquals(first, second);
+        Assertions.assertEquals(
+            1, new HashSet<>(Arrays.asList(first, second)).size()
         );
     }
 

@@ -197,6 +197,24 @@ final class MavenCentralTest {
     }
 
     /**
+     * Check that the list of the artifacts which we return can not be
+     * modified, as {@link MvnRepo} promises.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindArtifactsAreUnmodifiable() throws Exception {
+        try (FakeMavenCentral fake = new FakeMavenCentral()) {
+            fake.withSearch(
+                FakeMavenCentral.fixture("search-mixed-groups.json")
+            );
+            MavenCentralTest.assertUnmodifiable(
+                fake.browser().findArtifacts("guice")
+            );
+        }
+    }
+
+    /**
      * Check that a search answer which contains no documents at all gives an
      * empty list rather than breaking the search. The answer is navigated
      * field by field, so every one of those fields has to tolerate being
@@ -432,6 +450,69 @@ final class MavenCentralTest {
                 fake.browser()
                     .findVersions(this.mine, 99, MavenCentral.MAX_ROWS)
                     .isEmpty()
+            );
+        }
+    }
+
+    /**
+     * Check that a page which starts inside the list but reaches past its
+     * end gives only the versions which are there.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsPartialLastPage() throws Exception {
+        try (FakeMavenCentral fake = this.serving()) {
+            Assertions.assertEquals(
+                this.vers.subList(this.vers.size() - 1, this.vers.size()),
+                MavenCentralTest.names(
+                    fake.browser().findVersions(
+                        this.mine, this.vers.size() - 1, MavenCentral.MAX_ROWS
+                    )
+                )
+            );
+        }
+    }
+
+    /**
+     * Check that a negative start or a negative amount of rows is rejected
+     * instead of being silently turned into some page.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsRejectsNegativePaging() throws Exception {
+        try (FakeMavenCentral fake = this.serving()) {
+            final MvnRepo mvn = fake.browser();
+            Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> mvn.findVersions(this.mine, -1, MavenCentral.MAX_ROWS)
+            );
+            Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> mvn.findVersions(this.mine, 0, -1)
+            );
+        }
+    }
+
+    /**
+     * Check that the lists of the versions which we return can not be
+     * modified, as {@link MvnRepo} promises.
+     *
+     * @throws Exception If something went wrong.
+     */
+    @Test
+    void testFindVersionsAreUnmodifiable() throws Exception {
+        try (FakeMavenCentral fake = this.serving()) {
+            final MvnRepo mvn = fake.browser();
+            final MvnArtifactVersion middle =
+                this.version(this.vers.get(MavenCentralTest.TWO));
+            MavenCentralTest.assertUnmodifiable(mvn.findVersions(this.mine));
+            MavenCentralTest.assertUnmodifiable(
+                mvn.findVersionsNewerThan(middle)
+            );
+            MavenCentralTest.assertUnmodifiable(
+                mvn.findVersionsOlderThan(middle)
             );
         }
     }
@@ -827,5 +908,19 @@ final class MavenCentralTest {
         final List<MvnArtifactVersion> versions
     ) {
         return versions.stream().map(MvnArtifactVersion::name).toList();
+    }
+
+    /**
+     * Check that the list is not empty and that adding to it fails.
+     *
+     * @param list The list.
+     * @param <T> The type of the list's elements.
+     */
+    private static <T> void assertUnmodifiable(final List<T> list) {
+        Assertions.assertFalse(list.isEmpty());
+        final T first = list.getFirst();
+        Assertions.assertThrows(
+            UnsupportedOperationException.class, () -> list.add(first)
+        );
     }
 }

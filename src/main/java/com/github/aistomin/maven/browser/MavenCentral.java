@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.maven.artifact.versioning.ComparableVersion;
@@ -224,20 +223,15 @@ public final class MavenCentral implements MvnRepo {
             final List<String> allVersions = parseMetadataXml(
                 this.get(url, HttpResponse.BodyHandlers.ofInputStream())
             );
-            final int endIndex = (int) Math.min(
-                (long) start + rows, allVersions.size()
-            );
-            final List<String> pagedVersions =
-                start < allVersions.size()
-                    ? allVersions.subList(start, endIndex)
-                    : new ArrayList<>();
-            return pagedVersions.stream()
-                .map(
+            return allVersions.stream()
+                .skip(start)
+                .limit(rows)
+                .<MvnArtifactVersion>map(
                     ver -> new MavenArtifactVersion(
                         artifact, ver, MvnPackagingType.UNKNOWN, null
                     )
                 )
-                .collect(Collectors.toList());
+                .toList();
         } catch (final InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new MvnException(exception);
@@ -330,7 +324,7 @@ public final class MavenCentral implements MvnRepo {
         return versions
             .stream()
             .filter(ver -> predicate.test(ver, loaded))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**
@@ -341,7 +335,8 @@ public final class MavenCentral implements MvnRepo {
      * are navigated with {@code path} rather than with {@code get}.
      *
      * @param response Maven search API JSON response.
-     * @return The list of the artifacts which the answer mentions.
+     * @return The unmodifiable list of the artifacts which the answer
+     *  mentions.
      * @throws JsonProcessingException If the answer is not a valid JSON.
      */
     private static List<MvnArtifact> parseSearchResponse(
@@ -360,7 +355,7 @@ public final class MavenCentral implements MvnRepo {
                 )
             );
         }
-        return artifacts;
+        return Collections.unmodifiableList(artifacts);
     }
 
     /**

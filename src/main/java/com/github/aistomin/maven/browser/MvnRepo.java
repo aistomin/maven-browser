@@ -30,7 +30,7 @@ public interface MvnRepo {
      * it may safely contain spaces and other special characters.
      *
      * @param str The search string. It may be a part of group or artifact name.
-     * @return The list of the found artifacts.
+     * @return The unmodifiable list of the found artifacts.
      * @throws MvnException If the problem occurred while reading from the repo.
      */
     List<MvnArtifact> findArtifacts(String str) throws MvnException;
@@ -43,7 +43,7 @@ public interface MvnRepo {
      * @param str The search string. It may be a part of group or artifact name.
      * @param start The start index of the search.
      * @param rows The max amount of results.
-     * @return The list of the found artifacts.
+     * @return The unmodifiable list of the found artifacts.
      * @throws MvnException If the problem occurred while reading from the repo.
      */
     List<MvnArtifact> findArtifacts(
@@ -58,7 +58,7 @@ public interface MvnRepo {
      * timestamp.
      *
      * @param artifact The artifact.
-     * @return The list of the found versions of the artifact.
+     * @return The unmodifiable list of the found versions of the artifact.
      * @throws MvnException If the problem occurred while reading from the repo.
      */
     List<MvnArtifactVersion> findVersions(
@@ -74,10 +74,12 @@ public interface MvnRepo {
      * {@link #findVersions(MvnArtifact)}.
      *
      * @param artifact The artifact.
-     * @param start Indent of the search.
+     * @param start The index of the first version to return.
      * @param rows The max amount of results.
-     * @return The list of the found versions of the artifact.
+     * @return The unmodifiable list of the found versions of the artifact.
      * @throws MvnException If the problem occurred while reading from the repo.
+     * @throws IllegalArgumentException If {@code start} or {@code rows} is
+     *  negative.
      */
     List<MvnArtifactVersion> findVersions(
         MvnArtifact artifact, Integer start, Integer rows
@@ -89,7 +91,7 @@ public interface MvnRepo {
      * them - see {@link #findVersions(MvnArtifact)}.
      *
      * @param version The version.
-     * @return The list of the newer versions.
+     * @return The unmodifiable list of the newer versions.
      * @throws MvnException If the problem occurred while reading from the repo,
      *  or if the version is not found in the repository.
      */
@@ -103,7 +105,7 @@ public interface MvnRepo {
      * them - see {@link #findVersions(MvnArtifact)}.
      *
      * @param version The version.
-     * @return The list of the older versions.
+     * @return The unmodifiable list of the older versions.
      * @throws MvnException If the problem occurred while reading from the repo,
      *  or if the version is not found in the repository.
      */

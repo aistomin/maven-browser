@@ -155,6 +155,24 @@ next-`SNAPSHOT` commit to `master`, creates the `v<version>` GitHub release with
 generated notes, and closes the release ticket and the milestone. No version branch is
 created (the old `5.0`-style branches are legacy). Don't run the release profile locally.
 
+After every release, javadoc.io must be synced by hand — it generates docs lazily and
+never notices new Maven Central versions on its own, so the README badge and docs link
+stay stale until triggered (after 6.0 the badge still showed 5.3; before that it sat at
+5.0 while 5.1–5.3 were on Central with valid javadoc jars). Once the artifacts have
+propagated to Central, run (no auth needed, both return 303):
+
+```bash
+curl -X POST https://javadoc.io/versions/com.github.aistomin/maven-browser/sync
+curl -X POST -d "versionId=<version>" https://javadoc.io/versions/com.github.aistomin/maven-browser/upload
+```
+
+Then verify that the badge
+(https://javadoc.io/badge2/com.github.aistomin/maven-browser/javadoc.svg) and
+https://javadoc.io/doc/com.github.aistomin/maven-browser show the new version. The same
+can be done in the browser on the [versions
+page](https://javadoc.io/versions/com.github.aistomin/maven-browser): "Sync from Maven",
+then select the new version and "Upload selected".
+
 ## Git conventions
 
 Work on a branch named `Issue-<number>` off `master`. Commit messages are
@@ -224,6 +242,7 @@ plus release issue) and get approval before creating anything. On the go:
    - [ ] Run the "Release to Maven Central" workflow (optionally with a dry run first),
          with this ticket as `release-ticket` and the next milestone's release ticket
          as `next-release-ticket`.
+   - [ ] javadoc.io synced for the new version (see Releasing).
 
    Please read [how to contribute](https://github.com/aistomin/maven-browser?tab=readme-ov-file#how-to-contribute)
    ```

@@ -8,8 +8,8 @@
 [![license](https://img.shields.io/github/license/aistomin/maven-browser)](https://github.com/aistomin/maven-browser/blob/master/LICENSE)
 
 This Java library allows you to search and browse Maven Central. It uses the
-[Maven Central Search API](https://search.maven.org/classic/#api) for artifact
-lookup and the standard Maven repository layout at
+[Maven Central Search API](https://central.sonatype.org/search/rest-api-guide/)
+for artifact lookup and the standard Maven repository layout at
 [repo1.maven.org](https://repo1.maven.org/maven2/) (`maven-metadata.xml`) for
 version information. The library can be useful for developers who create CI
 scripts or other tools that need to read information from Maven Central.
@@ -51,7 +51,7 @@ look at the [examples here](https://github.com/aistomin/maven-browser/tree/maste
 ## License
 
 The project is licensed under the terms of the
-[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+[Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html).
 
 ## Have You Found a Bug? Do You Have Any Suggestions?
 

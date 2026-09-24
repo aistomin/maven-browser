@@ -8,7 +8,7 @@ import com.github.aistomin.maven.browser.MavenCentral
     @Grab(
         group = 'com.github.aistomin',
         module = 'maven-browser',
-        version = '5.3'
+        version = '6.0'
     )
 )
 final slurper = new groovy.xml.XmlSlurper(false, false)
